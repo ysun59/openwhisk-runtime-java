@@ -19,14 +19,22 @@ package org.apache.openwhisk.runtime.java.action;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -38,21 +46,72 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
+import javassist.ClassPool;
+import javassist.Loader;
+
 public class Proxy {
     private HttpServer server;
 
-    private JarLoader loader = null;
+    private ClassLoader loader = null;
+
+    private SimpleTranslator translator = new SimpleTranslator();
+
+    private Method main = null;
 
     public Proxy(int port) throws IOException {
         this.server = HttpServer.create(new InetSocketAddress(port), -1);
 
         this.server.createContext("/init", new InitHandler());
         this.server.createContext("/run", new RunHandler());
-        this.server.setExecutor(null); // creates a default executor
+        this.server.setExecutor(null); // TODO - change to use a multithreaded executor
     }
 
     public void start() {
         server.start();
+    }
+
+    private static Path saveBase64EncodedFile(InputStream encoded) throws Exception {
+        Base64.Decoder decoder = Base64.getDecoder();
+
+        InputStream decoded = decoder.wrap(encoded);
+
+        File destinationFile = File.createTempFile("useraction", ".jar");
+        destinationFile.deleteOnExit();
+        Path destinationPath = destinationFile.toPath();
+
+        Files.copy(decoded, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+
+        return destinationPath;
+    }
+
+    private void prepareMain(String entrypoint) throws ClassNotFoundException, NoSuchMethodException, SecurityException {
+        final String[] splittedEntrypoint = entrypoint.split("#");
+        final String entrypointClassName = splittedEntrypoint[0];
+        final String entrypointMethodName = splittedEntrypoint.length > 1 ? splittedEntrypoint[1] : "main";
+
+        Class<?> mainClass = loader.loadClass(entrypointClassName);
+
+        main = mainClass.getMethod(entrypointMethodName, new Class[] { JsonObject.class });
+        main.setAccessible(true);
+        int modifiers = main.getModifiers();
+        if (main.getReturnType() != JsonObject.class || !Modifier.isStatic(modifiers) || !Modifier.isPublic(modifiers)) {
+            throw new NoSuchMethodException("main");
+        }
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private static void augmentEnv(Map<String, String> newEnv) {
+        try {
+            for (Class cl : Collections.class.getDeclaredClasses()) {
+                if ("java.util.Collections$UnmodifiableMap".equals(cl.getName())) {
+                    Field field = cl.getDeclaredField("m");
+                    field.setAccessible(true);
+                    Object obj = field.get(System.getenv());
+                    Map<String, String> map = (Map<String, String>) obj;
+                    map.putAll(newEnv);
+                }
+            }
+        } catch (Exception e) {}
     }
 
     private static void writeResponse(HttpExchange t, int code, String content) throws IOException {
@@ -103,11 +162,23 @@ public class Proxy {
                         InputStream jarIs = new ByteArrayInputStream(base64Jar.getBytes(StandardCharsets.UTF_8));
 
                         // Save the bytes to a file.
-                        Path jarPath = JarLoader.saveBase64EncodedFile(jarIs);
+                        Path jarPath = saveBase64EncodedFile(jarIs);
 
-                        // Start up the custom classloader. This also checks that the
-                        // main method exists.
-                        loader = new JarLoader(jarPath, mainClass);
+                        // Start up the custom classloader.
+                        ClassPool pool = ClassPool.getDefault();
+
+                        // Add the application jar to the class pool
+                        pool.appendClassPath(jarPath.toAbsolutePath().toString());
+                        loader = new Loader(pool);
+
+                        // Delegating all gson classes to the default classloader.
+                        ((Loader)loader).delegateLoadingOf("com.google.gson.");
+
+                        // Add a translator to apply transformations to the loaded classes.
+                        ((Loader)loader).addTranslator(pool, translator);
+
+                        // Find the main method and prepare it for activations.
+                        prepareMain(mainClass);
 
                         Proxy.writeResponse(t, 200, "OK");
                         return;
@@ -150,11 +221,18 @@ public class Proxy {
                     } catch (Exception e) {}
                 }
 
-                Thread.currentThread().setContextClassLoader(loader);
+                // We always give a new classloader for a new invocation. It is used as an identifier.
+                Thread.currentThread().setContextClassLoader(new Loader(loader, ClassPool.getDefault()));
                 System.setSecurityManager(new WhiskSecurityManager());
 
+                // Prepare environment.
+                augmentEnv(env);
+
+                // TODO - make this call lazy.
+                translator.callStaticInitialisers(loader);
+
                 // User code starts running here.
-                JsonObject output = loader.invokeMain(inputObject, env);
+                JsonObject output = (JsonObject) main.invoke(null, inputObject);
                 // User code finished running here.
 
                 if (output == null) {
