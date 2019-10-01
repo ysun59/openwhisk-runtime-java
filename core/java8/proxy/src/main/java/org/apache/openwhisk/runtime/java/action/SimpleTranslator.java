@@ -13,7 +13,6 @@ import javassist.CtField;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.Translator;
-import javassist.bytecode.ClassFilePrinter;
 import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
 
@@ -53,30 +52,16 @@ public class SimpleTranslator implements Translator {
         return true;
 	}
 
-	private void setupMapsInitialiser(ClassPool pool, CtClass cc) throws CannotCompileException {
-		CtConstructor staticConstructor = cc.getClassInitializer();
-
-		// No static initialiser, no static fields to be initialised.
-	    if (staticConstructor == null) {
-	    	return;
-	    }
-
-	    for (CtField field : cc.getFields()) {
-			if (Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers())) {
-				staticConstructor.insertBeforeBody(String.format("%s = new WeakHashMap<>();", field.getName()));
-			}
-		}
-
-
-	}
-
 	private void convertStaticsFieldsToMaps(ClassPool pool, CtClass cc) throws NotFoundException, CannotCompileException {
 		CtClass weakmap = pool.get("java.util.WeakHashMap");
 		for (CtField field : cc.getFields()) {
 			if (Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers())) {
-				System.err.println("Found field " + field);
-				cc.removeField(field);
-				cc.addField(new CtField(weakmap, field.getName(), cc));
+				System.err.println(String.format("Replacing field %s.%s type of %s by %s", 
+						field.getDeclaringClass().getName(), field.getName(), field.getType().getName(), "java.util.WeakHashMap"));
+				//cc.removeField(field); // TODO - maybe we shouldn't remove until we finished fixing the code...
+				CtField newfield = new CtField(weakmap, field.getName() + "__map", cc);
+				newfield.setModifiers(field.getModifiers());
+				cc.addField(newfield, CtField.Initializer.byNew(weakmap));
 			}
 		}
 	}
@@ -97,12 +82,12 @@ public class SimpleTranslator implements Translator {
                             || f.getClassName().startsWith("org.xml.")) {
                 		return;
                 	}
-                	else if (f.isStatic() && Modifier.isFinal(f.getField().getModifiers())) {
+                	else if (f.isStatic() && !Modifier.isFinal(f.getField().getModifiers())) {
+                		System.out.println(String.format("Found field access %s.%s (%s:%d)", f.getClassName(), f.getFieldName(), f.getFileName(), f.getLineNumber()));
                         if (f.isWriter()) {
-                        	f.replace(String.format("%s.%s.put(Thread.currentThread().getContextClassLoader(), $1);", f.getClassName(), f.getFieldName()));
+                        	f.replace(String.format("%s.%s__map.put(Thread.currentThread().getContextClassLoader(), ($w)$1);", f.getField().getDeclaringClass().getName(), f.getFieldName()));
                         } else {
-                        	System.err.println(String.format("$_ = %s.%s.get(Thread.currentThread().getContextClassLoader());", f.getClassName(), f.getFieldName()));
-                        	f.replace(String.format("$_ = %s.%s.get(Thread.currentThread().getContextClassLoader());", f.getClassName(), f.getFieldName()));
+                        	f.replace(String.format("$_ = ($r)%s.%s__map.get(Thread.currentThread().getContextClassLoader());", f.getField().getDeclaringClass().getName(), f.getFieldName()));
                         }
                     }
                 } catch (NotFoundException e) {
@@ -111,10 +96,16 @@ public class SimpleTranslator implements Translator {
             }
         };
 
-		cc.getClassInitializer().instrument(editor);
+        if (cc.getClassInitializer() != null) {
+        	cc.getClassInitializer().instrument(editor);	
+        }
+
+		// TODO - this returns all non-private constructors
 		for (CtConstructor constructor : cc.getConstructors()) {
 			constructor.instrument(editor);
 		}
+		// TODO - this returns all non-private methods
+		// TODO - this also includes methods from the superclasses
 		for (CtMethod method : cc.getMethods()) {
 			method.instrument(editor);
 		}
@@ -124,9 +115,11 @@ public class SimpleTranslator implements Translator {
 	public void onLoad(ClassPool pool, String classname) throws NotFoundException, CannotCompileException {
 		CtClass cc = pool.get(classname);
 
+		// TODO - get fields returns the public fields including fields from superclasses!
+		
 		convertStaticsFieldsToMaps(pool, cc);
 
-		setupMapsInitialiser(pool, cc);
+		//setupMapsInitialiser(pool, cc);
 
 		convertFieldAccesses(pool, cc);
 
@@ -135,7 +128,9 @@ public class SimpleTranslator implements Translator {
 		}
 
 		System.err.println("Loaded " + classname);
-		ClassFilePrinter.print(cc.getClassFile());
+		
+		// TODO - need to see how to actually print the bytecode of each method.
+		//ClassFilePrinter.print(cc.getClassFile());
 	}
 
 	@Override

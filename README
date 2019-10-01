@@ -1,0 +1,22 @@
+Three ways to test:
+
+wdir=/home/rbruno/nethz/git/openwhisk-runtime-java
+
+1 - run in openwhisk
+    $wdir/build.sh
+    $wdir/install.sh
+    /home/rbruno/git/incubator-openwhisk-devtools/docker-compose/wdir/java/run-java.sh
+
+2 - run in a container
+    $wdir/build.sh
+    $wdir/install-docker.sh
+    $wdir/lauch-docker.sh
+    $wdir/init.sh
+    $wdir/run.sh
+
+3 - run local
+    $wdir/build.sh
+    $wdir/install-local.sh
+    $wdir/lauch-local.sh
+    $wdir/init.sh
+    $wdir/run.sh
