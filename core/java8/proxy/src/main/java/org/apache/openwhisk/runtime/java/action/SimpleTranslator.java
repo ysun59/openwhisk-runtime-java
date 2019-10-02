@@ -3,7 +3,9 @@ package org.apache.openwhisk.runtime.java.action;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javassist.CannotCompileException;
 import javassist.ClassPool;
@@ -18,7 +20,11 @@ import javassist.expr.FieldAccess;
 
 public class SimpleTranslator implements Translator {
 
-	private List<String> classes = new ArrayList<>();
+	// classes that need to be statically initialized upon every invocation.
+	private Set<String> classesForStaticInitialization = new HashSet<>();
+	
+	// fields that were modified to use a map
+	private Set<String> modifiedFieldAccesses = new HashSet<>();
 
 	private boolean cloneStaticInitializer(CtClass cc) throws CannotCompileException {
 		CtConstructor staticConstructor = cc.getClassInitializer();
@@ -52,37 +58,36 @@ public class SimpleTranslator implements Translator {
         return true;
 	}
 
-	private void convertStaticsFieldsToMaps(ClassPool pool, CtClass cc) throws NotFoundException, CannotCompileException {
+	private List<CtField> createStaticFieldMaps(ClassPool pool, CtClass cc) throws NotFoundException, CannotCompileException {
 		CtClass weakmap = pool.get("java.util.WeakHashMap");
+		List<CtField> tobeRemoved = new ArrayList<>();
 		for (CtField field : cc.getFields()) {
 			if (Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers())) {
 				System.err.println(String.format("Replacing field %s.%s type of %s by %s", 
 						field.getDeclaringClass().getName(), field.getName(), field.getType().getName(), "java.util.WeakHashMap"));
-				//cc.removeField(field); // TODO - maybe we shouldn't remove until we finished fixing the code...
+				tobeRemoved.add(field);
 				CtField newfield = new CtField(weakmap, field.getName() + "__map", cc);
 				newfield.setModifiers(field.getModifiers());
 				cc.addField(newfield, CtField.Initializer.byNew(weakmap));
+				modifiedFieldAccesses.add(field.getSignature());
 			}
 		}
+		return tobeRemoved;
 	}
-
-	private void convertFieldAccesses(ClassPool pool, CtClass cc) throws CannotCompileException {
+	
+	private void convertStaticFieldAccesses(ClassPool pool, CtClass cc) throws CannotCompileException {
 		ExprEditor editor = new ExprEditor() {
 
             @Override
             public void edit(FieldAccess f) throws CannotCompileException {
                 try {
-                	// do not change how we access static fields of java libraries
-                	// TODO - it would be better if we knew if we have a map for it or not...
-                	if (f.getClassName().startsWith("java.")
-                            || f.getClassName().startsWith("javax.")
-                            || f.getClassName().startsWith("sun.")
-                            || f.getClassName().startsWith("com.sun.")
-                            || f.getClassName().startsWith("org.w3c.")
-                            || f.getClassName().startsWith("org.xml.")) {
+                	// if field was modified (it is static and non-final)
+                	if (!modifiedFieldAccesses.contains(f.getField().getSignature())) {
                 		return;
                 	}
-                	else if (f.isStatic() && !Modifier.isFinal(f.getField().getModifiers())) {
+                	
+                	// This if is not necessary, if it was modified, then it is static and not final...
+                	if (f.isStatic() && !Modifier.isFinal(f.getField().getModifiers())) {
                 		System.out.println(String.format("Found field access %s.%s (%s:%d)", f.getClassName(), f.getFieldName(), f.getFileName(), f.getLineNumber()));
                         if (f.isWriter()) {
                         	f.replace(String.format("%s.%s__map.put(Thread.currentThread().getContextClassLoader(), ($w)$1);", f.getField().getDeclaringClass().getName(), f.getFieldName()));
@@ -117,27 +122,27 @@ public class SimpleTranslator implements Translator {
 
 		// TODO - get fields returns the public fields including fields from superclasses!
 		
-		convertStaticsFieldsToMaps(pool, cc);
+		List<CtField> tobeRemoved = createStaticFieldMaps(pool, cc);
 
-		//setupMapsInitialiser(pool, cc);
+		convertStaticFieldAccesses(pool, cc);
 
-		convertFieldAccesses(pool, cc);
-
+		// Fields have to be removed after converting accesses.
+		for (CtField f : tobeRemoved) {
+			cc.removeField(f);
+		}
+		
 		if (cloneStaticInitializer(cc)) {
-			classes.add(cc.getName());
+			classesForStaticInitialization.add(cc.getName());
 		}
 
 		System.err.println("Loaded " + classname);
-		
-		// TODO - need to see how to actually print the bytecode of each method.
-		//ClassFilePrinter.print(cc.getClassFile());
 	}
 
 	@Override
 	public void start(ClassPool arg0) throws NotFoundException, CannotCompileException { }
 
 	public void callStaticInitialisers(ClassLoader cl) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-		for (String classname : classes) {
+		for (String classname : classesForStaticInitialization) {
 			Class<?> clazz = Class.forName(classname, false, cl);
 			System.err.println("Calling " + clazz.getMethod("__static_init", new Class[] {}));
 			clazz.getMethod("__static_init", new Class[] {}).invoke(null, new Object[] {});

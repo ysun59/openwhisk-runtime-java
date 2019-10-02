@@ -1,3 +1,3 @@
 #!/bin/bash
 
-tools/invoke.py init Hello /home/rbruno/git/incubator-openwhisk-devtools/docker-compose/wdir/java/hello.jar
+tools/invoke.py init Hello test-app/hello/hello.jar
