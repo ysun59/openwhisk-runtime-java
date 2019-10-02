@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executors;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -63,7 +64,7 @@ public class Proxy {
 
         this.server.createContext("/init", new InitHandler());
         this.server.createContext("/run", new RunHandler());
-        this.server.setExecutor(null); // TODO - change to use a multithreaded executor
+        this.server.setExecutor(Executors.newCachedThreadPool());
     }
 
     public void start() {

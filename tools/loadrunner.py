@@ -1,10 +1,10 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
-import datetime
 from concurrent.futures import ThreadPoolExecutor, wait, as_completed
 from random import randint
 from argparse import ArgumentParser
 import invoke
+import time
 
 parser = ArgumentParser()
 parser.add_argument("-nt", "--number_of_threads",     type=int, default=15,  help="The number of threads")
@@ -17,18 +17,26 @@ number_of_experiments = args.number_of_experiments
 result_array = [0]*number_of_experiments
 
 def run_request(index):
-    #value = invoke.processPayload('{"seed":"%s"}' % (index))
-    value = invoke.processPayload('{"seed":"1"}')
-    print(value)
+    value = invoke.processPayload('{"seed":"%s"}' % index)
     args.host=invoke.dockerHost()
     args.port=8080
     url = invoke.containerRoute(args, 'run')
-    print(url)
+
+    print(value, end=" -> ")
+    start = time.time()
     r = invoke.requests.post(url, json = {"value": value})
-    print(r.text)
+    end = time.time()
+    print(r.text, end=" -> ")
+    print(round((end-start)*1000,3), "ms")
 
 pool = ThreadPoolExecutor(max_workers=number_of_threads)
+
+all_start = time.time()
 
 futures = [pool.submit(run_request,i) for i in range(number_of_experiments)]
 
 results = [r.result() for r in as_completed(futures)]
+
+all_end = time.time()
+
+print("Experiment took", round((all_end-all_start)*1000,3), "ms")
