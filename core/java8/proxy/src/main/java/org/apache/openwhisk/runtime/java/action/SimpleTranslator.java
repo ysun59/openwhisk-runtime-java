@@ -61,10 +61,9 @@ public class SimpleTranslator implements Translator {
 	private List<CtField> createStaticFieldMaps(ClassPool pool, CtClass cc) throws NotFoundException, CannotCompileException {
 		CtClass weakmap = pool.get("java.util.WeakHashMap");
 		List<CtField> tobeRemoved = new ArrayList<>();
-		for (CtField field : cc.getFields()) {
+		for (CtField field : cc.getDeclaredFields()) {
 			if (Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers())) {
-				System.err.println(String.format("Replacing field %s.%s type of %s by %s", 
-						field.getDeclaringClass().getName(), field.getName(), field.getType().getName(), "java.util.WeakHashMap"));
+				System.err.println(String.format("Adding field %s.%s type of %s", field.getDeclaringClass().getName(), field.getName() + "__map", "java.util.WeakHashMap"));
 				tobeRemoved.add(field);
 				CtField newfield = new CtField(weakmap, field.getName() + "__map", cc);
 				newfield.setModifiers(field.getModifiers());
@@ -105,13 +104,11 @@ public class SimpleTranslator implements Translator {
         	cc.getClassInitializer().instrument(editor);	
         }
 
-		// TODO - this returns all non-private constructors
-		for (CtConstructor constructor : cc.getConstructors()) {
+		for (CtConstructor constructor : cc.getDeclaredConstructors()) {
 			constructor.instrument(editor);
 		}
-		// TODO - this returns all non-private methods
-		// TODO - this also includes methods from the superclasses
-		for (CtMethod method : cc.getMethods()) {
+
+		for (CtMethod method : cc.getDeclaredMethods()) {
 			method.instrument(editor);
 		}
 	}
@@ -120,14 +117,13 @@ public class SimpleTranslator implements Translator {
 	public void onLoad(ClassPool pool, String classname) throws NotFoundException, CannotCompileException {
 		CtClass cc = pool.get(classname);
 
-		// TODO - get fields returns the public fields including fields from superclasses!
-		
 		List<CtField> tobeRemoved = createStaticFieldMaps(pool, cc);
 
 		convertStaticFieldAccesses(pool, cc);
 
 		// Fields have to be removed after converting accesses.
 		for (CtField f : tobeRemoved) {
+			System.err.println(String.format("Removing field %s.%s type of %s", f.getDeclaringClass().getName(), f.getName(), f.getType().getName()));
 			cc.removeField(f);
 		}
 		
