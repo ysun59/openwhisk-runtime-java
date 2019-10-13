@@ -172,8 +172,9 @@ public class Proxy {
                         pool.appendClassPath(jarPath.toAbsolutePath().toString());
                         loader = new Loader(pool);
 
-                        // Delegating all gson classes to the default classloader.
+                        // Delegating classes to the default classloader.
                         ((Loader)loader).delegateLoadingOf("com.google.gson.");
+                        ((Loader)loader).delegateLoadingOf("org.apache.openwhisk.runtime.java.action.");
 
                         // Add a translator to apply transformations to the loaded classes.
                         ((Loader)loader).addTranslator(pool, translator);

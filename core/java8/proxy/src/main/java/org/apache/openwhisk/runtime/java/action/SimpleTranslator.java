@@ -9,12 +9,20 @@ import java.util.Set;
 
 import javassist.CannotCompileException;
 import javassist.ClassPool;
+import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.Translator;
+import javassist.bytecode.BadBytecode;
+import javassist.bytecode.CodeAttribute;
+import javassist.bytecode.CodeIterator;
+import javassist.bytecode.ConstPool;
+import javassist.bytecode.Descriptor;
+import javassist.bytecode.Mnemonic;
+import javassist.bytecode.Opcode;
 import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
 
@@ -112,6 +120,62 @@ public class SimpleTranslator implements Translator {
 			method.instrument(editor);
 		}
 	}
+	
+	private void insertYieldPoint(ConstPool cp, CodeIterator ci, int index) throws BadBytecode {
+		int cindex = cp.addClassInfo("org.apache.openwhisk.runtime.java.action.Scheduler");
+		int mindex = cp.addMethodrefInfo(cindex, "yield", Descriptor.ofMethod(CtClass.voidType, new CtClass[] {}));
+		ci.insertAt(index, new byte[] { (byte)Opcode.INVOKESTATIC, (byte) ((byte)mindex >> 8), (byte)mindex});
+	}
+	
+	private void insertYieldPoints(CtBehavior behavior) throws CannotCompileException {
+		behavior.insertAfter("org.apache.openwhisk.runtime.java.action.Scheduler.yield();");
+		CodeAttribute ca = behavior.getMethodInfo().getCodeAttribute();
+		CodeIterator ci = ca.iterator();
+		
+		while (ci.hasNext()) {
+		    int index;
+			try {
+				index = ci.next();
+			    int op = ci.byteAt(index);
+			    if (op == Opcode.GOTO) {
+			    	short nbyte =  (short)ci.byteAt(index + 1);
+			    	short nnbyte = (short)ci.byteAt(index + 2);
+			    	short operand = (short) (((short) (nbyte << 8)) + nnbyte);
+			    	if (operand < 0) {
+			    		insertYieldPoint(ca.getConstPool(), ci, index);
+			    	}				    	
+		    	} else if (op == Opcode.GOTO_W) {
+		    		// branchbyte1 << 24 + branchbyte2 << 16 + branchbyte3 << 8 + branchbyte4
+		    		short nbyte =    (short)ci.byteAt(index + 1);
+			    	short nnbyte =   (short)ci.byteAt(index + 2);
+			    	short nnnbyte =  (short)ci.byteAt(index + 3);
+			    	short nnnnbyte = (short)ci.byteAt(index + 4);
+			    	short operand =  (short) (((short) (nbyte << 24)) + ((short) nnbyte << 16) + ((short) nnnbyte << 8) + nnnnbyte);
+			    	System.out.println(Mnemonic.OPCODE[op]);
+			    	if (operand < 0) {
+			    		insertYieldPoint(ca.getConstPool(), ci, index);
+			    	}
+			    }
+			} catch (BadBytecode e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private void insertYieldPoints(CtClass cc) throws CannotCompileException {
+
+        if (cc.getClassInitializer() != null) {
+        	insertYieldPoints(cc.getClassInitializer());	
+        }
+
+		for (CtConstructor constructor : cc.getDeclaredConstructors()) {
+			insertYieldPoints(constructor);
+		}
+
+		for (CtMethod method : cc.getDeclaredMethods()) {
+			insertYieldPoints(method);		
+		}
+	}
 
 	@Override
 	public void onLoad(ClassPool pool, String classname) throws NotFoundException, CannotCompileException {
@@ -131,11 +195,15 @@ public class SimpleTranslator implements Translator {
 			classesForStaticInitialization.add(cc.getName());
 		}
 
+		insertYieldPoints(cc);
+		
 		System.err.println("Loaded " + classname);
 	}
 
 	@Override
-	public void start(ClassPool arg0) throws NotFoundException, CannotCompileException { }
+	public void start(ClassPool arg0) throws NotFoundException, CannotCompileException { 
+		CtClass.debugDump = "/tmp/dump";
+	}
 
 	public void callStaticInitialisers(ClassLoader cl) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		for (String classname : classesForStaticInitialization) {
