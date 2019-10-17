@@ -16,6 +16,7 @@ configmap = collections.OrderedDict()
 throughput_avg_map = collections.OrderedDict()
 throughput_std_map = collections.OrderedDict()
 latency_map = collections.OrderedDict()
+cost_map = collections.OrderedDict()
 warmup_x_map = collections.OrderedDict()
 warmup_y_map = collections.OrderedDict()
 
@@ -27,6 +28,10 @@ lambda_pricing['0.4'] = 0.00001250
 lambda_pricing['0.6'] = 0.00001771
 lambda_pricing['0.8'] = 0.00002396
 lambda_pricing['1']   = 0.00002917
+lambda_pricing['1.2'] = 0.00003542
+lambda_pricing['1.4'] = 0.00004168
+lambda_pricing['1.6'] = 0.00004688
+
 
 def parse_args(argv):
   global configfile
@@ -96,6 +101,7 @@ def plot_throughput():
   plt.clf()
 
 def plot_cost():
+  global cost_map
   cost_map = throughput_avg_map.copy()
   for exp in cost_map:
     if exp.startswith('vcpu-0.1-'):
@@ -111,6 +117,12 @@ def plot_cost():
       cost_map[exp] = 100000000.0 / cost_map[exp] * lambda_pricing['0.8']
     elif exp.startswith('vcpu-1-'):
       cost_map[exp] = 100000000.0 / cost_map[exp] * lambda_pricing['1']
+    elif exp.startswith('vcpu-1.2-'):
+      cost_map[exp] = 100000000.0 / cost_map[exp] * lambda_pricing['1.2']
+    elif exp.startswith('vcpu-1.4-'):
+      cost_map[exp] = 100000000.0 / cost_map[exp] * lambda_pricing['1.4']
+    elif exp.startswith('vcpu-1.6-'):
+      cost_map[exp] = 100000000.0 / cost_map[exp] * lambda_pricing['1.6']
     else:
       raise ValueError('Unknown vcpu count for', exp)
 
@@ -125,6 +137,12 @@ def plot_cost():
   plt.gca().grid(which='major', axis='y', linestyle='--')
   plt.savefig('cost.png', dpi=1000)
   plt.clf()
+
+# Syntax: <exp id> <throughput> <cost/100M>
+def print_table():
+  for exp in cost_map:
+    print(exp, throughput_avg_map[exp], latency_map[exp], cost_map[exp])
+
 
 def main(argv):
 
@@ -152,6 +170,7 @@ def main(argv):
   plot_warmup()
   plot_throughput()
   plot_cost()
+  print_table()
 
 if __name__ == "__main__":
   main(sys.argv[1:])

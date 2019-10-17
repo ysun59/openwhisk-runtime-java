@@ -27,6 +27,7 @@ function run {
 
 mkdir $wrk_dir &> /dev/null
 rm $wrk_dir/*
+docker pull rfbpb/java8action
 
 for vcpu in $vcpus
 do
@@ -36,6 +37,10 @@ do
     elif [ "$vcpu" = "0.6" ]; then mem="1088m"
     elif [ "$vcpu" = "0.8" ]; then mem="1472m"
     elif [ "$vcpu" = "1"   ]; then mem="1792m"
+    elif [ "$vcpu" = "1.2" ]; then mem="2176m"
+    elif [ "$vcpu" = "1.4" ]; then mem="2560m"
+    elif [ "$vcpu" = "1.6" ]; then mem="2880m"
+
     else echo "Unknown vcpu config..."; exit 1
     fi
 
