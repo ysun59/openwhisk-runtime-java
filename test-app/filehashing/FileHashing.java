@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Random;
 import java.io.InputStream;
 import com.google.gson.JsonObject;
@@ -25,8 +26,10 @@ public class FileHashing {
 		}
 	}
 
-    public static JsonObject main(JsonObject args) {
+    public static JsonObject main(JsonObject args, Map<String, Object> globals, int id) {
     	int hash = 0;
+
+        System.out.println(String.format("time %d id %d", globals.get("time"), id));
 
     	if (args.has("seed")) {
     		hash = run(args.getAsJsonPrimitive("seed").getAsInt());

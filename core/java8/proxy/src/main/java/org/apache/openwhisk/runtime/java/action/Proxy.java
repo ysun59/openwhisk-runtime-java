@@ -35,9 +35,11 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 
 import com.google.gson.JsonElement;
@@ -58,6 +60,8 @@ public class Proxy {
     private SimpleTranslator translator = new SimpleTranslator();
 
     private Method main = null;
+
+    private ConcurrentHashMap<String, Object> globals = new ConcurrentHashMap<>();
 
     public Proxy(int port) throws IOException {
         this.server = HttpServer.create(new InetSocketAddress(port), -1);
@@ -92,7 +96,7 @@ public class Proxy {
 
         Class<?> mainClass = loader.loadClass(entrypointClassName);
 
-        main = mainClass.getMethod(entrypointMethodName, new Class[] { JsonObject.class });
+        main = mainClass.getMethod(entrypointMethodName, new Class[] { JsonObject.class, Map.class, int.class });
         main.setAccessible(true);
         int modifiers = main.getModifiers();
         if (main.getReturnType() != JsonObject.class || !Modifier.isStatic(modifiers) || !Modifier.isPublic(modifiers)) {
@@ -177,7 +181,8 @@ public class Proxy {
                         ((Loader)loader).delegateLoadingOf("org.apache.openwhisk.runtime.java.action.");
 
                         // Add a translator to apply transformations to the loaded classes.
-                        ((Loader)loader).addTranslator(pool, translator);
+                        // TODO - there is a bug when loading minio!
+                        //((Loader)loader).addTranslator(pool, translator);
 
                         // Find the main method and prepare it for activations.
                         prepareMain(mainClass);
@@ -233,8 +238,10 @@ public class Proxy {
                 // TODO - make this call lazy.
                 translator.callStaticInitialisers(loader);
 
+                globals.put("time", new Date().getTime());
+
                 // User code starts running here.
-                JsonObject output = (JsonObject) main.invoke(null, inputObject);
+                JsonObject output = (JsonObject) main.invoke(null, inputObject, globals, Thread.currentThread().getContextClassLoader().hashCode());
                 // User code finished running here.
 
                 if (output == null) {
