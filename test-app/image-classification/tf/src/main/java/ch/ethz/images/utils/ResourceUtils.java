@@ -13,4 +13,8 @@ public class ResourceUtils {
     public static BufferedImage getImage(String file_path) throws IOException {
         return ImageIO.read(getInputStream(file_path));
     }
+    
+    public static BufferedImage getImage(InputStream is) throws IOException {
+        return ImageIO.read(is);
+    }
 }
