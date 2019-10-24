@@ -32,14 +32,14 @@ parser = ArgumentParser()
 parser.add_argument("-nt", "--number_of_threads",     type=int, default=15,  help="The number of threads")
 parser.add_argument("-ne", "--number_of_experiments", type=int, default=100, help="Total number of requests to server")
 parser.add_argument("-wl", "--workload", type=str, default='TF', help="Workload name")
-parser.add_argument("-wl2", "--workload2", type=str, default='TF', help="Workload2 name")
+parser.add_argument("-wl2", "--workload2", type=str, default='TF2', help="Workload2 name")
 parser.add_argument("-c", "--concurrency", type=int, default=1, help="The number of threads")
 parser.add_argument("-f", "--frequency", type=int, default=100, help="Frequency of shifting workloads")
 args = parser.parse_args()
 
 
 def deploy_functions():
-    deploy_command = 'wsk --apihost https://%s --auth 23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP action create -i %s tf/target/image-classifier.jar --main com.github.chen0040.tensorflow.classifiers.images.InceptionImageClassifierDemo --docker rfbpb/java8action -c %s'
+    deploy_command = 'wsk --apihost https://%s --auth 23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP action update -i %s tf/target/image-classifier-1.0.1.jar --main ch.ethz.InceptionImageClassifierDemo --docker rfbpb/java8action -c %s'
     dc = deploy_command%(ip_address, args.workload, str(args.concurrency))
     execute(dc)
 
