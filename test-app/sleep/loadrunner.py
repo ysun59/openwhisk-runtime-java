@@ -35,17 +35,19 @@ parser.add_argument("-ne", "--number_of_experiments", type=int, default=100, hel
 parser.add_argument("-wl", "--workload", type=str, default='Sleep', help="Workload name")
 parser.add_argument("-wl2", "--workload2", type=str, default='Sleep2', help="Workload2 name")
 parser.add_argument("-c", "--concurrency", type=int, default=1, help="The number of threads")
+parser.add_argument("-f", "--frequency", type=int, default=10, help="Frequency of shifting workloads")
+parser.add_argument("-m", "--memory", type=int, default=256, help="Memory")
 args = parser.parse_args()
 
 
 def deploy_functions():
-    deploy_command = 'wsk --apihost https://%s --auth 23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP action update -i %s sleep.jar --main Sleep --docker rfbpb/java8action -c %s'
-    dc = deploy_command%(ip_address, args.workload, str(args.concurrency))
+    deploy_command = 'wsk --apihost https://%s --auth 23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP action update -i %s sleep.jar --main Sleep --docker rfbpb/java8action -c %s -m %s'
+    dc = deploy_command%(ip_address, args.workload, str(args.concurrency), str(args.memory))
     execute(dc)
 
     #deploy constant workload
     #dc = deploy_command%(ip_address, args.workload2, '1')
-    dc = deploy_command%(ip_address, args.workload2, str(args.concurrency))
+    dc = deploy_command%(ip_address, args.workload2, str(args.concurrency), str(args.memory))
     execute(dc)
 
 
@@ -64,7 +66,7 @@ def main():
         start = time.time()
 
         workload = ''
-        alterante_frequency = 20
+        alterante_frequency = args.frequency
         if (start%alterante_frequency) < (alterante_frequency/2):
             workload = args.workload
         else:
@@ -76,7 +78,7 @@ def main():
         end = time.time()
         et = round((end-start)*1000,3)
         print(f"{payload} -> {r.text} -> {et}ms")
-        return et - 1000
+        return et
 
     pool = ThreadPoolExecutor(max_workers=number_of_threads)
 
