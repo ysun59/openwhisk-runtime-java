@@ -15,7 +15,8 @@ resultsdir = ''
 configmap = collections.OrderedDict()
 throughput_avg_map = collections.OrderedDict()
 throughput_std_map = collections.OrderedDict()
-latency_map = collections.OrderedDict()
+latency_avg_map = collections.OrderedDict()
+latency_std_map = collections.OrderedDict()
 cost_map = collections.OrderedDict()
 warmup_x_map = collections.OrderedDict()
 warmup_y_map = collections.OrderedDict()
@@ -78,13 +79,19 @@ def load_log(path):
         latency = float(line.split(' ')[4])
   return warmup_x, warmup_y, throughput, latency
 
-def plot_warmup():
-  for label in warmup_x_map.keys():
-    plt.plot(warmup_x_map[label], warmup_y_map[label], label=label)
+def plot_warmup(vcpu):
+  plt.figure(figsize=(10, 5))
+#  for label in warmup_x_map.keys():
+#      if vcpu in label:
+#        plt.plot(warmup_x_map[label], warmup_y_map[label], label=label, linewidth=0.5)
+
+  labels = ['vcpu-0.4-conc-4', 'vcpu-0.8-conc-8', 'vcpu-1.2-conc-12', 'vcpu-1.6-conc-16']
+  for label in labels:
+       plt.plot(warmup_x_map[label], warmup_y_map[label], label=label, linewidth=0.5)
   plt.ylabel('Response Time (ms)')
   plt.xlabel('Time')
   plt.legend(loc='upper right')
-  plt.savefig('warmup.png')
+  plt.savefig('warmup-' + vcpu + '.png', dpi=1000)
   plt.clf()
 
 def plot_throughput():
@@ -98,6 +105,19 @@ def plot_throughput():
   plt.ylabel('Invocations/s')
   plt.subplots_adjust(bottom=0.25)
   plt.savefig('throughput.png', dpi=1000)
+  plt.clf()
+
+def plot_latency():
+  x_labels = list(latency_avg_map.keys())
+  x = range(1, len(x_labels) + 1)
+  y = list(latency_avg_map.values())
+  y_error = list(latency_std_map.values())
+  plt.figure(figsize=(10, 5))
+  plt.bar(x, y, yerr=y_error, width=0.5)
+  plt.xticks(x, x_labels, rotation='vertical')
+  plt.ylabel('Avg Response Time')
+  plt.subplots_adjust(bottom=0.25)
+  plt.savefig('latency.png', dpi=1000)
   plt.clf()
 
 def plot_cost():
@@ -141,7 +161,7 @@ def plot_cost():
 # Syntax: <exp id> <throughput> <cost/100M>
 def print_table():
   for exp in cost_map:
-    print(exp, throughput_avg_map[exp], latency_map[exp], cost_map[exp])
+    print(exp, throughput_avg_map[exp], latency_avg_map[exp], cost_map[exp])
 
 
 def main(argv):
@@ -165,12 +185,14 @@ def main(argv):
         exp_latency[rep] = latency
       throughput_avg_map[exp_id] = statistics.mean(exp_throughput.values())
       throughput_std_map[exp_id] = statistics.stdev(exp_throughput.values())
-      latency_map[exp_id] = statistics.mean(exp_latency.values())
+      latency_avg_map[exp_id] = statistics.mean(exp_latency.values())
+      latency_std_map[exp_id] = statistics.stdev(exp_latency.values())
 
-  plot_warmup()
+  plot_warmup('0.1')
   plot_throughput()
+  plot_latency()
   plot_cost()
-  print_table()
+#  print_table()
 
 if __name__ == "__main__":
   main(sys.argv[1:])
