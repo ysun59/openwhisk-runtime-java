@@ -27,7 +27,8 @@ experiments_start_time = 0
 experiments_finish_time = 0
 
 def run_request(index):
-    value = invoke.processPayload('{"seed":"%s"}' % index)
+    #value = invoke.processPayload('{"seed":"%s"}' % index)
+    value = invoke.processPayload('{"index":"%s"}' % '0')
     args.host=invoke.dockerHost()
     args.port=8080
     url = invoke.containerRoute(args, 'run')
