@@ -20,8 +20,8 @@ def execute(command):
     p_status = p.wait()
     return output
 
-#ip_address = '10.1.212.71'
-ip_address = '129.132.102.71'
+ip_address = '10.1.212.71'
+#ip_address = '129.132.102.71'
 url='https://%s/api/v1/namespaces/_/actions/%s?blocking=true&result=true'
 headers = {
     "Authorization": "Basic MjNiYzQ2YjEtNzFmNi00ZWQ1LThjNTQtODE2YWE0ZjhjNTAyOjEyM3pPM3haQ0xyTU42djJCS0sxZFhZRnBYbFBrY2NPRnFtMTJDZEFzTWdSVTRWck5aOWx5R1ZDR3VNREdJd1A=",
