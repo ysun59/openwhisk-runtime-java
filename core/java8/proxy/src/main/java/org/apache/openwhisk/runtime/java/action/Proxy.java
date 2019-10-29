@@ -179,10 +179,12 @@ public class Proxy {
                         // Delegating classes to the default classloader.
                         ((Loader)loader).delegateLoadingOf("com.google.gson.");
                         ((Loader)loader).delegateLoadingOf("org.apache.openwhisk.runtime.java.action.");
+                        ((Loader)loader).delegateLoadingOf("org.xmlpull.");
+                        ((Loader)loader).delegateLoadingOf("okhttp3.");
 
                         // Add a translator to apply transformations to the loaded classes.
                         // TODO - there is a bug when loading minio!
-                        //((Loader)loader).addTranslator(pool, translator);
+                        ((Loader)loader).addTranslator(pool, translator);
 
                         // Find the main method and prepare it for activations.
                         prepareMain(mainClass);
