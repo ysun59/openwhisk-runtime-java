@@ -1,0 +1,23 @@
+service: tensorflow
+
+frameworkVersion: ">=1.2.0 <2.0.0"
+
+package:
+  exclude:
+    - execute_aws.py
+    - execute_local.py
+    - redeploy_aws.py
+    - redeploy_local.py
+
+provider:
+  name: aws
+  runtime: python2.7
+  memorySize: 512
+  timeout: 60
+  region: us-west-2
+  role: arn:aws:iam::612948648635:role/service-role/hpy_lambda
+
+functions:
+  main:
+    handler: index.handler
+    name: ${self:provider.stage}-tf-object-detection
