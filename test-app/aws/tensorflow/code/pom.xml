@@ -4,16 +4,26 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>ch.ethz</groupId>
-	<artifactId>sleep</artifactId>
+	<artifactId>tensorflow</artifactId>
 	<packaging>jar</packaging>
 	<version>1.0-SNAPSHOT</version>
-	<name>sleep</name>
+	<name>tensorflow</name>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-lambda-java-core</artifactId>
 			<version>1.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-s3</artifactId>
+			<version>1.11.163</version>
+		</dependency>
+		<dependency>
+			<groupId>org.tensorflow</groupId>
+			<artifactId>tensorflow</artifactId>
+			<version>1.4.0</version>
 		</dependency>
 	</dependencies>
 

@@ -2,25 +2,28 @@
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import com.amazonaws.services.lambda.runtime.Context;
+
 import images.models.inception.InceptionImageClassifier;
 import images.utils.ResourceUtils;
+import util.AwsUtil;
+import util.MemoryUtil;
 
-public class InceptionImageClassifierDemo {
+public class Main {
 
 	public static InceptionImageClassifier classifier = null;
-
+	
 	public static void init_classifier() {
 		classifier = new InceptionImageClassifier();
 		try {
-			InputStream is = null;
-			classifier.load_model(is);
-			classifier.load_labels(is);
+			classifier.load_model(AwsUtil.getS3Stream("tensorflow_inception_graph.pb"));
+			classifier.load_labels(AwsUtil.getS3Stream("imagenet_comp_graph_label_strings.txt"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -37,9 +40,7 @@ public class InceptionImageClassifierDemo {
 		BufferedImage img = null;
 
 		try {
-			// TODO
-			InputStream is = null;
-			img = ResourceUtils.getImage(is);
+			img = ResourceUtils.getImage(AwsUtil.getS3Stream(image_path));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -47,6 +48,21 @@ public class InceptionImageClassifierDemo {
 		String predicted_label = classifier.predict_image(img);
 	}
 
+	public String handleRequest(Object data, Context context) {
+        LinkedHashMap request = (LinkedHashMap) data;
+        //request.get("input")
+
+        double current_utilization = MemoryUtil.current_utilization_runtime();
+        init_classifier();
+        double current_utilization2 = MemoryUtil.current_utilization_runtime();
+        predict(0);
+        double current_utilization3 = MemoryUtil.current_utilization_runtime();
+        String output =  Double.toString(current_utilization)+" "+Double.toString(current_utilization2)
+            +" "+Double.toString(current_utilization3);
+
+        return output;
+    }
+	
 	public static void main(String[] args) throws IOException {
 		Runtime rt = Runtime.getRuntime();
 		int concurrency = 1;
