@@ -33,6 +33,18 @@ lambda_pricing['1.2'] = 0.00003542
 lambda_pricing['1.4'] = 0.00004168
 lambda_pricing['1.6'] = 0.00004688
 
+# maps cthreads to vcpus
+vcpus = {}
+vcpus['1'] = '0.1'
+vcpus['2'] = '0.2'
+vcpus['4'] = '0.4'
+vcpus['6'] = '0.6'
+vcpus['8'] = '0.8'
+vcpus['10'] = '1'
+vcpus['12'] = '1.2'
+vcpus['14'] = '1.4'
+vcpus['16'] = '1.6'
+
 
 def parse_args(argv):
   global configfile
@@ -79,19 +91,17 @@ def load_log(path):
         latency = float(line.split(' ')[4])
   return warmup_x, warmup_y, throughput, latency
 
-def plot_warmup(vcpu):
+def plot_warmup():
   plt.figure(figsize=(10, 5))
-#  for label in warmup_x_map.keys():
-#      if vcpu in label:
-#        plt.plot(warmup_x_map[label], warmup_y_map[label], label=label, linewidth=0.5)
-
-  labels = ['vcpu-0.4-conc-4', 'vcpu-0.8-conc-8', 'vcpu-1.2-conc-12', 'vcpu-1.6-conc-16']
+  #labels = ['vcpu-0.4-conc-4', 'vcpu-0.8-conc-8', 'vcpu-1.2-conc-12', 'vcpu-1.6-conc-16']
+  labels = warmup_x_map.keys()
   for label in labels:
-       plt.plot(warmup_x_map[label], warmup_y_map[label], label=label, linewidth=0.5)
+    plt.plot(warmup_x_map[label], warmup_y_map[label], label=label, linewidth=0.5)
+
   plt.ylabel('Response Time (ms)')
   plt.xlabel('Time')
   plt.legend(loc='upper right')
-  plt.savefig('warmup-' + vcpu + '.png', dpi=1000)
+  plt.savefig('warmup.png', dpi=1000)
   plt.clf()
 
 def plot_throughput():
@@ -170,25 +180,25 @@ def main(argv):
 
   load_config()
 
-  for vcpu in configmap['vcpus']:
-    for cthread in configmap['cthreads']:
-      exp_id = 'vcpu-' + vcpu + '-conc-' + cthread
-      exp_throughput = {}
-      exp_latency = {}
-      for rep in configmap['reps']:
-        log_path= resultsdir + '/' + exp_id + '-rep-' + rep + '.log'
-        print(log_path)
-        warmup_x, warmup_y, throughput, latency = load_log(log_path)
-        warmup_x_map[exp_id] = warmup_x
-        warmup_y_map[exp_id] = warmup_y
-        exp_throughput[rep] = throughput
-        exp_latency[rep] = latency
-      throughput_avg_map[exp_id] = statistics.mean(exp_throughput.values())
-      throughput_std_map[exp_id] = statistics.stdev(exp_throughput.values())
-      latency_avg_map[exp_id] = statistics.mean(exp_latency.values())
-      latency_std_map[exp_id] = statistics.stdev(exp_latency.values())
+  for cthread in configmap['cthreads']:
+    vcpu = vcpus[cthread]
+    exp_id = 'vcpu-' + vcpu + '-conc-' + cthread
+    exp_throughput = {}
+    exp_latency = {}
+    for rep in configmap['reps']:
+      log_path= resultsdir + '/' + exp_id + '-rep-' + rep + '.log'
+      print(log_path)
+      warmup_x, warmup_y, throughput, latency = load_log(log_path)
+      warmup_x_map[exp_id] = warmup_x
+      warmup_y_map[exp_id] = warmup_y
+      exp_throughput[rep] = throughput
+      exp_latency[rep] = latency
+    throughput_avg_map[exp_id] = statistics.mean(exp_throughput.values())
+    throughput_std_map[exp_id] = statistics.stdev(exp_throughput.values())
+    latency_avg_map[exp_id] = statistics.mean(exp_latency.values())
+    latency_std_map[exp_id] = statistics.stdev(exp_latency.values())
 
-  plot_warmup('0.1')
+  plot_warmup()
   plot_throughput()
   plot_latency()
   plot_cost()
