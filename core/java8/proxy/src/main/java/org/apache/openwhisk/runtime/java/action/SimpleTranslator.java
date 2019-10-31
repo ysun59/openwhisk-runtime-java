@@ -1,6 +1,7 @@
 package org.apache.openwhisk.runtime.java.action;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -34,6 +35,8 @@ public class SimpleTranslator implements Translator {
 	// fields that were modified to use a map
 	private Set<String> modifiedFieldAccesses = new HashSet<>();
 
+	private static boolean debug = false;
+	
 	private boolean cloneStaticInitializer(CtClass cc) throws CannotCompileException {
 		CtConstructor staticConstructor = cc.getClassInitializer();
 
@@ -46,7 +49,7 @@ public class SimpleTranslator implements Translator {
     	CtConstructor staticConstructorClone = new CtConstructor(staticConstructor, cc, null);
         staticConstructorClone.getMethodInfo().setName("__static_init");
         staticConstructorClone.setModifiers(Modifier.PUBLIC | Modifier.STATIC);
-        cc.addConstructor(staticConstructorClone);
+        
 
         // This field access hack is necessary because static initialisers often write to final fields.
         staticConstructorClone.instrument(new ExprEditor() {
@@ -63,6 +66,7 @@ public class SimpleTranslator implements Translator {
             }
         });
 
+        cc.addConstructor(staticConstructorClone);
         return true;
 	}
 
@@ -71,7 +75,9 @@ public class SimpleTranslator implements Translator {
 		List<CtField> tobeRemoved = new ArrayList<>();
 		for (CtField field : cc.getDeclaredFields()) {
 			if (Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers())) {
-				System.err.println(String.format("Adding field %s.%s type of %s", field.getDeclaringClass().getName(), field.getName() + "__map", "java.util.WeakHashMap"));
+				if (debug) {
+					System.err.println(String.format("Adding field %s.%s type of %s", field.getDeclaringClass().getName(), field.getName() + "__map", "java.util.WeakHashMap"));	
+				}
 				tobeRemoved.add(field);
 				CtField newfield = new CtField(weakmap, field.getName() + "__map", cc);
 				newfield.setModifiers(field.getModifiers());
@@ -88,18 +94,21 @@ public class SimpleTranslator implements Translator {
             @Override
             public void edit(FieldAccess f) throws CannotCompileException {
                 try {
+                	CtField field = f.getField();
                 	// if field was modified (it is static and non-final)
-                	if (!modifiedFieldAccesses.contains(f.getField().getSignature())) {
+                	if (!modifiedFieldAccesses.contains(field.getSignature())) {
                 		return;
                 	}
                 	
                 	// This if is not necessary, if it was modified, then it is static and not final...
-                	if (f.isStatic() && !Modifier.isFinal(f.getField().getModifiers())) {
-                		System.out.println(String.format("Found field access %s.%s (%s:%d)", f.getClassName(), f.getFieldName(), f.getFileName(), f.getLineNumber()));
+                	if (f.isStatic() && !Modifier.isFinal(field.getModifiers())) {
+                		if (debug) {
+                			System.out.println(String.format("Found field access %s.%s (%s:%d)", f.getClassName(), f.getFieldName(), f.getFileName(), f.getLineNumber()));	
+                		}
                         if (f.isWriter()) {
-                        	f.replace(String.format("%s.%s__map.put(Thread.currentThread().getContextClassLoader(), ($w)$1);", f.getField().getDeclaringClass().getName(), f.getFieldName()));
+                        	f.replace(String.format("%s.%s__map.put(Thread.currentThread().getContextClassLoader(), ($w)$1);", field.getDeclaringClass().getName(), f.getFieldName()));
                         } else {
-                        	f.replace(String.format("$_ = ($r)%s.%s__map.get(Thread.currentThread().getContextClassLoader());", f.getField().getDeclaringClass().getName(), f.getFieldName()));
+                        	f.replace(String.format("$_ = ($r)%s.%s__map.get(Thread.currentThread().getContextClassLoader());", field.getDeclaringClass().getName(), f.getFieldName()));
                         }
                     }
                 } catch (NotFoundException e) {
@@ -187,17 +196,21 @@ public class SimpleTranslator implements Translator {
 
 		// Fields have to be removed after converting accesses.
 		for (CtField f : tobeRemoved) {
-			System.err.println(String.format("Removing field %s.%s type of %s", f.getDeclaringClass().getName(), f.getName(), f.getType().getName()));
-			cc.removeField(f);
+			if (debug) {
+				System.err.println(String.format("Removing field %s.%s type of %s", f.getDeclaringClass().getName(), f.getName(), f.getType().getName()));	
+			}
+			// TODO - this was causing a bug...?
+			//cc.removeField(f);
 		}
 		
 		if (cloneStaticInitializer(cc)) {
 			classesForStaticInitialization.add(cc.getName());
 		}
 
-		insertYieldPoints(cc);
-		
-		System.err.println("Loaded " + classname);
+		//insertYieldPoints(cc);
+		if (debug) {
+			System.err.println("Loaded " + classname);	
+		}
 	}
 
 	@Override
@@ -206,10 +219,14 @@ public class SimpleTranslator implements Translator {
 	}
 
 	public void callStaticInitialisers(ClassLoader cl) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-		for (String classname : classesForStaticInitialization) {
+		for (String classname : new HashSet<String>(classesForStaticInitialization)) {
 			Class<?> clazz = Class.forName(classname, false, cl);
-			System.err.println("Calling " + clazz.getMethod("__static_init", new Class[] {}));
-			clazz.getMethod("__static_init", new Class[] {}).invoke(null, new Object[] {});
+			if (debug) {
+				System.err.println("Calling " + clazz.getMethod("__static_init", new Class[] {}));	
+			}
+			Method m = clazz.getMethod("__static_init", new Class[] {});
+			m.setAccessible(true);
+			m.invoke(null, new Object[] {});
 		}
 	}
 
