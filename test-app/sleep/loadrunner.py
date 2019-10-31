@@ -78,7 +78,11 @@ def main():
         end = time.time()
         et = round((end-start)*1000,3)
         print(f"{payload} -> {r.text} -> {et}ms")
-        return et
+
+        isSlowStart = 0 if 'slow_start\":\"0' in r.text else 2
+        if isSlowStart != 0:
+            isSlowStart = 1 if 'slow_start\":\"1' in r.text else 2
+        return (et, isSlowStart)
 
     pool = ThreadPoolExecutor(max_workers=number_of_threads)
 
@@ -92,8 +96,12 @@ def main():
 
     print(results)
     with open(f'data/{args.concurrency}_{args.number_of_threads}.txt', 'w') as f:
-      f.write(','.join([str(x) for x in results]))
-    #print("Experiment took", round((all_end-all_start)*1000,3), "ms")
+        f.write(','.join([str(x[0]) for x in results if x[1]!= 2]))
+    with open(f'data/{args.concurrency}_{args.number_of_threads}_ss.txt', 'w') as f:
+        f.write(','.join([str(x[1]) for x in results if x[1]!= 2]))
+
+    total_execution_time = round((all_end-all_start)*1000,3)
+    #print("Experiment took", , "ms")
 
 if __name__ == '__main__':
     main()

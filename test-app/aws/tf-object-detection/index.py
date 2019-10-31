@@ -97,14 +97,14 @@ def run_inference_on_image(image):
     if SESSION is None:
         SESSION = tf.InteractiveSession()
         create_graph()
-    mem2 = get_memory()
-
     softmax_tensor = tf.get_default_graph().get_tensor_by_name('softmax0:0')
+    mem2 = get_memory()
     predictions = SESSION.run(softmax_tensor, {'input:0': np.expand_dims(image_data, axis=0)})
     
     return 'lion', mem2
 
 def handler(event, context):
+    print(tf.__version__)
     mem1 = get_memory()
     st = int(round(time.time() * 1000))
     start_stats = getStats()
