@@ -59,6 +59,7 @@ public class Sleep{
     public static JsonObject main(JsonObject args, Map<String, Object> globals, int id) {
     	int time = 1000;
         double mem1 = current_utilization_runtime();
+        //int ss = 1;
         int ss = setSlowStart(globals);
 
     	if (args.has("time")) {

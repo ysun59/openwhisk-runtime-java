@@ -64,9 +64,10 @@ def plot_slow_starts():
             threads = int(sp[1].split('.')[0])
 
             data_points.append(sum(data))
-            labels.append(str(threads))
-            
+            labels.append(threads)
 
+    labels,data_points = zip(*sorted(zip(labels,data_points))) 
+    labels = [str(x) for x in labels]
     ax.bar(labels, data_points, align='center', alpha=0.5)
     
     ax.grid(color='#e3e3e3', linestyle='--', linewidth=0.5)
