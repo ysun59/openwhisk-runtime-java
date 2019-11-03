@@ -1,0 +1,4 @@
+0 Runtime 43
+1 Libraries 149.384
+2 Shared_data 88.236
+3 Local_state 116.788
