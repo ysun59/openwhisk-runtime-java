@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-
+import boto3
 from concurrent.futures import ThreadPoolExecutor, wait, as_completed
 from random import randint
 from argparse import ArgumentParser
@@ -37,15 +37,21 @@ def main():
 
     result_array = [0]*number_of_experiments
 
+    lambda_client = boto3.client('lambda')
+
     def run_request(index):
         start = time.time()
-        execute(f'bash invoke.sh tmp/{index}.txt')
+        response = lambda_client.invoke(
+            FunctionName='sleep-jvm',
+            InvocationType='RequestResponse',
+        )
+        #execute(f'bash invoke.sh tmp/{index}.txt')
         end = time.time()
         et = round((end-start)*1000,3)
         print(f"{et}ms")
-
-        with open(f'tmp/{index}.txt', 'r') as file:
-            data = file.read().replace('\n', '')
+        data = response['Payload'].read().decode('utf-8')
+        # with open(f'tmp/{index}.txt', 'r') as file:
+        #     data = file.read().replace('\n', '')
         isSlowStart = 0 if ' 0\"' in data else 2
         if isSlowStart != 0:
             isSlowStart = 1 if ' 1\"' in data else 2

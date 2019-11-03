@@ -41,7 +41,7 @@ args = parser.parse_args()
 
 
 def deploy_functions():
-    deploy_command = 'wsk --apihost https://%s --auth 23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP action update -i %s sleep.jar --main Sleep --docker rfbpb/java8action -c %s -m %s'
+    deploy_command = 'wsk --apihost https://%s --auth 23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP action update -i %s sleep.jar --main Sleep --docker rfbpb/java8action -c %s -m %s -t 300000'
     memory = int(args.concurrency)*int(args.memory)
     dc = deploy_command%(ip_address, args.workload, str(args.concurrency), str(memory))
     execute(dc)
@@ -80,9 +80,10 @@ def main():
         et = round((end-start)*1000,3)
         print(f"{payload} -> {r.text} -> {et}ms")
 
-        isSlowStart = 0 if 'slow_start\":\"0' in r.text else 2
-        if isSlowStart != 0:
-            isSlowStart = 1 if 'slow_start\":\"1' in r.text else 2
+        isSlowStart = 0 if 'slow_start\":\"0' in r.text else 1
+        # isSlowStart = 0 if 'slow_start\":\"0' in r.text else 2
+        # if isSlowStart != 0:
+        #     isSlowStart = 1 if 'slow_start\":\"1' in r.text else 2
         return (et, isSlowStart)
 
     pool = ThreadPoolExecutor(max_workers=number_of_threads)

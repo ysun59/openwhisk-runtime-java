@@ -64,7 +64,7 @@ def plot_slow_starts():
             threads = int(sp[1].split('.')[0])
 
             data_points.append(sum(data))
-            labels.append(str(concurrency))
+            labels.append(str(threads))
             
 
     ax.bar(labels, data_points, align='center', alpha=0.5)
