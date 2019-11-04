@@ -16,27 +16,26 @@ set border 3 back linestyle 80 # Remove border on top and right.  These
                               set xtics nomirror
                               set ytics nomirror
 
-set output "output/jit.pdf"
-set ylabel "Methods in code cache" font ",9" #offset 2
-set xlabel "Number of function invocations" font ",9" # offset 2.5
+set output "output/all_cost.pdf"
+set ylabel "Cost (norm.)" font ",9" #offset 2
+set xlabel "Functions co-executed" font ",9" # offset 2.5
 
 #unset key
 #set key top right outside
 #set key title "# direct links"
-set key horiz
-set key outside top center font ",9"
+set key inside top right font ",9"
 #set key above font ",7" horizontal
 #set key spacing 1.5 samplen 0.5 height 0.7
-#unset key
+unset key
 
-set xtics font ",9"
+set xtics font ",7" 0,2,16
 set ytics font ",9"
 set style line 1 lt 1 lw 0.5
 
 #set xrange[0:16]
-set yrange[0:20000]
-#set xrange [0:1]
-set logscale x
+#set yrange[0:1]
+set xrange [0:16]
+#set logscale x
 
 
 
@@ -45,7 +44,7 @@ set logscale x
 #set key above width -8 vertical maxrows 2
 
 plot \
-  "data/data.txt" using 1:3 title "Sleep" with lines lc rgb "#4287f5" lw 3 dt 2, \
-  "data/data.txt" using 1:4 title "Image Class." with lines lc rgb "#fcbd35" lw 3 lt 2, \
-  "data/data.txt" using 1:2 title "File hashing" with lines lc rgb "#c625cf" lw 3 lt 3, \
-  "data/data.txt" using 1:5 title "Video" with lines lc rgb "#00875c" lw 3 dt 3
+  "data/cost.txt" using 1:2 title "Sleep" with lines lc rgb "#4287f5" lw 3 dt 2, \
+  "data/cost.txt" using 1:3 title "Image class." with lines lc rgb "#fcbd35" lw 3 lt 2, \
+  "data/cost.txt" using 1:4 title "File hashing" with lines lc rgb "#c625cf" lw 3 lt 3, \
+  "data/cost.txt" using 1:5 title "Video" with lines lc rgb "#00875c" lw 3 dt 3

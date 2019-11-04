@@ -18,7 +18,7 @@ set border 3 back linestyle 80 # Remove border on top and right.  These
 
 set output "output/container_latency.pdf"
 set ylabel "Average latency (ms)" font ",9" #offset 2
-set xlabel "Concurrent invocations" font ",9" # offset 2.5
+set xlabel "Functions co-executed" font ",9" # offset 2.5
 
 #unset key
 #set key top right outside
@@ -44,4 +44,4 @@ set xrange [0:16]
 #set key above width -8 vertical maxrows 2
 
 plot \
-  "data/data.txt" using 1:3 title "File hashing" with lines lc rgb "#4287f5" lw 1.5 lt 1
+  "data/data.txt" using 1:3 title "File hashing" with lines lc rgb "#4287f5" lw 3 lt 1

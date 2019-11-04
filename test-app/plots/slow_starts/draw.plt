@@ -24,8 +24,8 @@ set border 3 back linestyle 80 # Remove border on top and right.  These
                               set ytics nomirror
 
 set output "./output/slow_starts.pdf"
-set ylabel "Number of slow starts" font ",9" offset 1.5
-set xlabel "Concurrent requests" font ",9" #offset 2
+set ylabel "Number of cold starts" font ",9" offset 1.5
+set xlabel "Functions co-executed" font ",9" #offset 2
 
 set key top left inside font ",9"
 #set key outside bottom right font ",9"
@@ -33,7 +33,7 @@ set key top left inside font ",9"
 # unset key
 
 #set xtics font ",9" center offset 0,-0.11 rotate by 45 right
-set ytics font ",9" #0,.2,1.0
+#set ytics font ",9" #0,.2,1.0
 set style line 1 lt 1 lw 0.5
 #set xrange [0:]
 set yrange[0:]
@@ -54,8 +54,8 @@ set tic scale 0
 
 plot \
   "./tmp/aws.txt" using (($3)) title "AWS Lambda" with histogram lc rgb "#A52A2A" fs pattern 1, \
-  "./tmp/c1.txt" using (($3)) title "Concurrency=1" with histogram lc rgb "red"  fs pattern 5 , \
-  "./tmp/c4.txt" using (($3)) title "Concurrency=4" with histogram lc rgb "#7FFFD4" fs pattern 9
+  "./tmp/c1.txt" using (($3)) title "Co-executions=1" with histogram lc rgb "red"  fs pattern 5 , \
+  "./tmp/c4.txt" using (($3)) title "Co-executions=4" with histogram lc rgb "#7FFFD4" fs pattern 9
 
 #"./tmp/mean_fct_fifo.txt" using (($3/1000)) title "Oblivious" with histogram lc rgb "blue" fs pattern 2, \
 

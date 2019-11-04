@@ -22,7 +22,7 @@ set border 3 back linestyle 80 # Remove border on top and right.  These
 
 set output "output/container_cost.pdf"
 
-set xlabel "Concurrent invocations" font ",9" # offset 2.5
+set xlabel "Functions co-executed" font ",9" # offset 2.5
 set ylabel "Throughput (invocations/s)" font ",9" offset 1.5
 set y2label "Cost ($/100M)" font ",9" offset -3.
 
@@ -46,5 +46,5 @@ set y2range[0:20]
 #set xrange [:8]
 #set logscale y
 plot \
-  "./data/data.txt" using 1:2 title "Throughput" with lines dashtype "..._." lc rgb "red" lw 1.5, \
-  "./data/data.txt" using 1:4 title "Cost" with lines dashtype '.____.' lc rgb "orange" lw 1.5 lt 2 axes x1y2
+  "./data/data.txt" using 1:2 title "Throughput" with lines dashtype "..._." lc rgb "red" lw 3, \
+  "./data/data.txt" using 1:4 title "Cost" with lines dashtype '.____.' lc rgb "orange" lw 3 lt 2 axes x1y2
