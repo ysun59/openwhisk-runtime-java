@@ -58,7 +58,8 @@ plot \
   "./data/baseline.txt" using (($3)) title "Baseline" with histogram lc rgb "#A52A2A" fs pattern 1, \
   "./data/sleep.txt" using (($3)) title "Sleep" with histogram lc rgb "red"  fs pattern 5, \
   "./data/file_hashing.txt" using (($3)) title "File hashing" with histogram lc rgb "#7FFFD4" fs pattern 9, \
-  "./data/image_classification.txt" using (($3)) title "TensorFlow"  with histogram lc rgb "#D2691E" fs pattern 10
+  "./data/image_classification.txt" using (($3)) title "TensorFlow"  with histogram lc rgb "#D2691E" fs pattern 10, \
+  "./data/video.txt" using (($3)) title "Video" with histogram lc rgb "#006400" fs pattern 4
 
 #"./tmp/mean_fct_fifo.txt" using (($3/1000)) title "Oblivious" with histogram lc rgb "blue" fs pattern 2, \
 
