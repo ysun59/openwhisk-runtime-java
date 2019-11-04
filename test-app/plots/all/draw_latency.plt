@@ -23,7 +23,7 @@ set xlabel "Functions co-executed" font ",9" # offset 2.5
 #unset key
 #set key top right outside
 #set key title "# direct links"
-set key inside top left font ",9"
+set key inside bottom right font ",9"
 #set key above font ",7" horizontal
 #set key spacing 1.5 samplen 0.5 height 0.7
 #unset key
@@ -33,7 +33,7 @@ set ytics font ",9"
 set style line 1 lt 1 lw 0.5
 
 #set xrange[0:16]
-#set yrange[0:1]
+set yrange[0:1.4]
 set xrange [0:16]
 #set logscale x
 
@@ -45,6 +45,6 @@ set xrange [0:16]
 
 plot \
   "data/latency.txt" using 1:2 title "Sleep" with lines lc rgb "#4287f5" lw 3 dt 2, \
-  "data/latency.txt" using 1:3 title "Image class." with lines lc rgb "#fcbd35" lw 3 lt 2, \
+  "data/latency.txt" using 1:5 title "Image class." with lines lc rgb "#fcbd35" lw 3 lt 2, \
   "data/latency.txt" using 1:4 title "File hashing" with lines lc rgb "#c625cf" lw 3 lt 3, \
-  "data/latency.txt" using 1:5 title "Video" with lines lc rgb "#00875c" lw 3 dt 3
+  "data/latency.txt" using 1:3 title "Video" with lines lc rgb "#00875c" lw 3 dt 3

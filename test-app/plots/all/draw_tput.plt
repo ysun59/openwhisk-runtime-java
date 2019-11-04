@@ -45,6 +45,6 @@ set xrange [0:16]
 
 plot \
   "data/tput.txt" using 1:2 title "Sleep" with lines lc rgb "#4287f5" lw 3 dt 2, \
-  "data/tput.txt" using 1:3 title "Image class." with lines lc rgb "#fcbd35" lw 3 lt 2, \
+  "data/tput.txt" using 1:5 title "Image class." with lines lc rgb "#fcbd35" lw 3 lt 2, \
   "data/tput.txt" using 1:4 title "File hashing" with lines lc rgb "#c625cf" lw 3 lt 3, \
-  "data/tput.txt" using 1:5 title "Video" with lines lc rgb "#00875c" lw 3 dt 3
+  "data/tput.txt" using 1:3 title "Video" with lines lc rgb "#00875c" lw 3 dt 3
