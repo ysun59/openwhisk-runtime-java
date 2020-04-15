@@ -1,11 +1,11 @@
 #!/bin/bash
 
-datadir="/mnt/local/frodrigo/minio-data"
+datadir="/tmp/minio-data/files"
 mkdir -p $datadir
 
-for i in {1..10000}
+for i in {1..100}
 do
-	openssl rand 1048576 > $datadir/file-$i.dat
+	openssl rand 1024 > $datadir/file-$i.dat
 done
 
 #~/local/mc mb minio/mydata
