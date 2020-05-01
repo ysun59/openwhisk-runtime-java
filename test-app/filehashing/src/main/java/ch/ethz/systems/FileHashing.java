@@ -1,9 +1,12 @@
+package ch.ethz.systems;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import javax.xml.bind.DatatypeConverter;
@@ -13,18 +16,18 @@ import io.minio.MinioClient;
 public class FileHashing {
 
 	private static final int size = 1024;
-	private static final byte[] buffer = new byte[size];
+    private static final String storage = "http://r630-01:9000";
 
-    private static MinioClient init() {
+    private static MinioClient createconn() {
         try {
-            return new MinioClient("http://10.1.212.71:9000", "keykey", "secretsecret");
+            return new MinioClient(storage, "keykey", "secretsecret");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     // TODO - is this Minioclient thread safe?
-	private static String run(MinioClient minioClient, int seed) {
+	private static String run(MinioClient minioClient, int seed, byte[] buffer) {
 		try {
 			InputStream stream = minioClient.getObject("files", String.format("file-%d.dat", seed));
             for (int bytesread = 0;
@@ -38,24 +41,39 @@ public class FileHashing {
         return null;
 	}
 
+	private static MinioClient getConn(ConcurrentHashMap<String, Object> cglobals) {
+		MinioClient con = null;
+		String key = String.format("minio-%d",Thread.currentThread().getId());
+    	if (!cglobals.containsKey(key)) {
+    		con = createconn();
+    		cglobals.put(key, con);
+    	} else {
+    		con = (MinioClient) cglobals.get(key);
+    	}
+    	return con;
+	}
+
+	private static byte[] getBuffer(ConcurrentHashMap<String, Object> cglobals) {
+		byte[] buffer = null;
+		String key = String.format("buffer-%d",Thread.currentThread().getId());
+    	if (!cglobals.containsKey(key)) {
+    		buffer = new byte[size];
+    		cglobals.put(key, buffer);
+    	} else {
+    		buffer = (byte[]) cglobals.get(key);
+    	}
+    	return buffer;
+	}
+
+	// TODO - make globals a concurrent map?
     public static JsonObject main(JsonObject args, Map<String, Object> globals, int id) {
+    	ConcurrentHashMap<String, Object> cglobals = (ConcurrentHashMap<String, Object>) globals;
     	String hash = null;
-        MinioClient minioClient;
         long time = System.currentTimeMillis();
 
-        //System.out.println(String.format("time %d id %d", globals.get("time"), id));
-
-        synchronized (globals) {
-            if (!globals.containsKey("minio")) {
-                minioClient = init();
-                globals.put("minio", minioClient);
-            } else {
-                minioClient = (MinioClient) globals.get("minio");
-            }
-        }
 
         if (args.has("seed")) {
-    		hash = run(minioClient, args.getAsJsonPrimitive("seed").getAsInt());
+    		hash = run(getConn(cglobals), args.getAsJsonPrimitive("seed").getAsInt(), getBuffer(cglobals));
     	}
 
     	JsonObject response = new JsonObject();
