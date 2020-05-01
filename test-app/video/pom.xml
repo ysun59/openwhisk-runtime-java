@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="https://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.github.chen0040</groupId>
+	<groupId>ch.ethz.systems</groupId>
 	<packaging>jar</packaging>
-	<version>1.0.1</version>
-	<artifactId>video-transform</artifactId>
+	<version>0.0.1</version>
+	<artifactId>photons-java-video</artifactId>
 
 	<repositories>
 		<repository>
 			<id>central</id>
 			<name>Central Repository</name>
-			<url>http://repo.maven.apache.org/maven2</url>
+			<url>https://repo.maven.apache.org/maven2</url>
 			<layout>default</layout>
 			<snapshots>
 				<enabled>false</enabled>
@@ -21,13 +21,11 @@
 		</repository>
 
 	</repositories>
-
-
 	<pluginRepositories>
 		<pluginRepository>
 			<id>central</id>
 			<name>Central Repository</name>
-			<url>http://repo.maven.apache.org/maven2</url>
+			<url>https://repo.maven.apache.org/maven2</url>
 			<layout>default</layout>
 			<snapshots>
 				<enabled>false</enabled>
@@ -41,30 +39,10 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<java.version>1.8</java.version>
-
-		<surefire.version>2.19</surefire.version>
-		<failsafe.version>2.19.1</failsafe.version>
-		<findbugs.version>3.0.2</findbugs.version>
-		<cobertura.version>2.7</cobertura.version>
-		<checkstyle.version>2.17</checkstyle.version>
-		<pmd.version>3.5</pmd.version>
-		<jacoco.version>0.7.3.201502191951</jacoco.version>
-
-		<fastjson.version>1.2.24</fastjson.version>
-		<guava.version>19.0</guava.version>
-
-		<commons-lang3.version>3.4</commons-lang3.version>
-		<commons-io.version>2.4</commons-io.version>
-		<commons-math.version>3.2</commons-math.version>
-
-		<lombok.version>1.16.6</lombok.version>
-		<jackson.version>2.6.0</jackson.version>
 	</properties>
-
 
 	<build>
 		<pluginManagement>
@@ -77,7 +55,6 @@
 						<finalName>${project.artifactId}-${project.version}</finalName>
 						<appendAssemblyId>false</appendAssemblyId>
 						<descriptorRefs>
-							<!-- <descriptorRef>jar-with-dependencies</descriptorRef> -->
 							<descriptorRef>jar</descriptorRef>
 						</descriptorRefs>
 					</configuration>

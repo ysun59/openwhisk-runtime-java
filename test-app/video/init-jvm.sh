@@ -1,3 +1,3 @@
 #!/bin/bash
 
-../../tools/invoke.py init ch.ethz.FFMPEG code/target/video.jar
+../../tools/invoke.py init ch.ethz.systems.FFMPEG target/video.jar

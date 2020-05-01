@@ -1,4 +1,4 @@
-package ch.ethz;
+package ch.ethz.systems;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,7 +32,7 @@ public class FFMPEG {
         catch (IOException e) {}
         return content;
     }
-	
+
 	public static double current_utilization_runtime(){
         String meminfo = readAllBytes("/proc/meminfo").replace("\n", "");
         //total
@@ -40,7 +40,7 @@ public class FFMPEG {
         Matcher m = p.matcher(meminfo);
         m.find();
         long memory_total = Long.parseLong(m.group(1));
-        
+
         //free
         p = Pattern.compile("MemAvailable: *(.*?) kB");
         m = p.matcher(meminfo);
@@ -49,7 +49,7 @@ public class FFMPEG {
         return ((memory_total - memory_free)/1000.);
         //return (long)((memory_total)/1000.);
     }
-	
+
 	private static void copyInputStreamToFile(InputStream inputStream, File file) throws IOException {
 
 		try (FileOutputStream outputStream = new FileOutputStream(file)) {
@@ -67,8 +67,8 @@ public class FFMPEG {
 	public static void init_classifier() {
 		try {
 			// cls.load_model(ResourceUtils.getInputStream("tf_models/tensorflow_inception_graph.pb"));
-			minioClient = new MinioClient("http://r630-02:9000", "keykey", "secretsecret");
-			InputStream is = minioClient.getObject("video", "ffmpeg");
+			minioClient = new MinioClient("http://r630-01:9000", "keykey", "secretsecret");
+			InputStream is = minioClient.getObject("files", "ffmpeg");
 			copyInputStreamToFile(is, new File("ffmpeg"));
 			Process process = Runtime.getRuntime().exec("chmod +x ./ffmpeg");
 			process.waitFor();
@@ -106,7 +106,7 @@ public class FFMPEG {
 
 	public static void transform(int id) {
 		try {
-			InputStream is = minioClient.getObject("video", "1.mp4");
+			InputStream is = minioClient.getObject("files", "911511005.mp4");
 			String fileName = Integer.toString(id) + ".mp4";
 			copyInputStreamToFile(is, new File(fileName));
 			ffmpeg(fileName);
@@ -141,7 +141,7 @@ public class FFMPEG {
 		double m1 = current_utilization_runtime();
 
 		transform(id);
-		
+
 		double m2 = current_utilization_runtime();
 		JsonObject response = new JsonObject();
 		long runtime_mem= Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
