@@ -1,3 +1,5 @@
+package ch.ethz.systems;
+
 import com.google.gson.JsonObject;
 import java.lang.Thread;
 import java.util.Map;
@@ -26,7 +28,7 @@ public class Sleep{
         Matcher m = p.matcher(meminfo);
         m.find();
         long memory_total = Long.parseLong(m.group(1));
-        
+
         //free
         p = Pattern.compile("MemAvailable: *(.*?) kB");
         m = p.matcher(meminfo);
@@ -51,28 +53,33 @@ public class Sleep{
 
 	private static int run(int time) {
         try{
-            Thread.sleep(time);    
+            Thread.sleep(time);
         }catch(Exception e){}
         return time;
 	}
 
     public static JsonObject main(JsonObject args, Map<String, Object> globals, int id) {
     	int time = 1000;
-        
-        double mem1 = current_utilization_runtime();
+
+        //double mem1 = current_utilization_runtime();
         //int ss = 1;
-        int ss = setSlowStart(globals);
+        //int ss = setSlowStart(globals);
 
     	if (args.has("time")) {
             time = args.getAsJsonPrimitive("time").getAsInt();
     	}
         run(time);
 
-        double mem2 = current_utilization_runtime();
     	JsonObject response = new JsonObject();
+        /*
+        double mem2 = current_utilization_runtime();
     	response.addProperty("memory", String.format("%f %f", mem1, mem2));
         response.addProperty("slow_start", String.format("%d", ss));
-    	return response;
+        */
+    	response.addProperty("slept", String.format("%d", time));
+
+        return response;
+
     }
 
 }

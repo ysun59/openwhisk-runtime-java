@@ -1,3 +1,3 @@
 #!/bin/bash
 
-../../tools/invoke.py init Sleep sleep.jar
+../../tools/invoke.py init ch.ethz.systems.Sleep target/sleep.jar
