@@ -18,6 +18,8 @@ function run {
     cd $app_dir; ./build.sh; ./init-jvm.sh; cd - &> /dev/null
 
     # step 3: run loadrunner
+    # TODO - replace by ab
+    # ab -p test-app/filehashing/in.json -T application/json -c 256 -n 10000 http://ganymede:8080/run
     cd tools; ./loadrunner-jvm.py -nt $cthread -ne $nexps -nw $nwarms | tee $wrk_dir/$tag.log | grep -v "#"; cd - &> /dev/null
 
     docker cp $app_name:/tmp/container.gc $wrk_dir/$tag.gc
