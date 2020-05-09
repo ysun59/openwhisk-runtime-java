@@ -1,6 +1,8 @@
-# Vim
+# mix
 editinfo
 *.swp
+target/
+results-*
 
 # working logs, images, data, etc
 *.log

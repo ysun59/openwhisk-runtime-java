@@ -1,3 +1,3 @@
 #!/bin/bash
 
-../../tools/invoke.py run '{"seed":"35"}'
+../../tools/invoke.py run '{"seed":"1"}'
