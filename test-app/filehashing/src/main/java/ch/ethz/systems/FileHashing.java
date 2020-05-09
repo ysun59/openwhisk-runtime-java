@@ -1,11 +1,6 @@
 package ch.ethz.systems;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.io.InputStream;
 import java.security.MessageDigest;
@@ -15,7 +10,7 @@ import io.minio.MinioClient;
 
 public class FileHashing {
 
-	private static final int size = 1024;
+	private static final int size = 1024*1024;
     private static final String storage = "http://r630-01:9000";
 
     private static MinioClient createconn() {
@@ -65,7 +60,6 @@ public class FileHashing {
     	return buffer;
 	}
 
-	// TODO - make globals a concurrent map?
     public static JsonObject main(JsonObject args, Map<String, Object> globals, int id) {
     	ConcurrentHashMap<String, Object> cglobals = (ConcurrentHashMap<String, Object>) globals;
     	String hash = null;
