@@ -10,7 +10,7 @@ do
 	#openssl rand 1024 > $datadir/file-$i.dat
 done
 
-# for the video and image classification test
+# for the video, image classification test, and thumbnail
 cp res/* $datadir
 
 #~/local/mc mb minio/mydata
