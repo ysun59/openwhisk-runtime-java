@@ -6,7 +6,8 @@ mkdir -p $datadir
 # for the filehashing test
 for i in {1..100}
 do
-	openssl rand 1048576 > $datadir/file-$i.dat
+	openssl rand 2097152 > $datadir/file-$i.dat
+	#openssl rand 1048576 > $datadir/file-$i.dat
 	#openssl rand 1024 > $datadir/file-$i.dat
 done
 

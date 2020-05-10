@@ -10,7 +10,7 @@ import io.minio.MinioClient;
 
 public class FileHashing {
 
-	private static final int size = 1024*1024;
+	private static final int size = 2*1024*1024;
     private static final String storage = "http://r630-01:9000";
 
     private static MinioClient createconn() {
