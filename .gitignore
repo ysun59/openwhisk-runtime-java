@@ -1,5 +1,14 @@
-# Vim
+# mix
 editinfo
+*.swp
+target/
+results-*
+
+# working logs, images, data, etc
+*.log
+*.mem
+*.mp4
+*.png
 
 # Whisk
 nginx.conf
