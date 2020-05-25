@@ -5,7 +5,7 @@ set style line 80 lt rgb "#808080"
 
 # Line style for grid
 set style line 81 lt 0  # dashed
-set style line 81 lt rgb "#808080"  # grey
+set style line 81 lt rgb "#cccccc"  # grey
 # set missing "?"
 
 set grid back linestyle 81

@@ -5,7 +5,7 @@ set style line 80 lt rgb "#808080"
 
 # Line style for grid
 set style line 81 lt 0  # dashed
-set style line 81 lt rgb "#808080"  # grey
+set style line 81 lt rgb "#cccccc"  # grey
 # set missing "?"
 
 set grid back linestyle 81
@@ -16,11 +16,11 @@ set ytics nomirror
 #set logscale x
 
 set output "output/slowdown_scaling.pdf"
-set ylabel "Ratio" font ",9" offset 1.5
+set ylabel "Ratio" font ",9" offset 0.5
 set xlabel "Concurrent invocations" font ",9" #offset 2
 
-#unset key
-set key bottom right inside font ",8"
+unset key
+#set key bottom right inside font ",8"
 #set key title "# direct links"
 #set key at 275.,1.49 font ",9"
 #set key above font ",7" horizontal
@@ -40,6 +40,9 @@ set xrange [0:160]
 set yrange[0.0:35]
 
 set format y "%Hx"
+
+set label 1 "Execution time (regular/photons)" at 50,5 font ",9"
+set label 2 "Memory(regular/photons)" at 50,20 font ",9"
 
 
 plot \

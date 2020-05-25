@@ -5,7 +5,7 @@ set style line 80 lt rgb "#808080"
 
 # Line style for grid
 set style line 81 lt 0  # dashed
-set style line 81 lt rgb "#808080"  # grey
+set style line 81 lt rgb "#cccccc"  # grey
 # set missing "?"
 
 set grid back linestyle 81
@@ -45,8 +45,9 @@ set format y "%Hx"
 
 #set key above width -8 vertical maxrows 2
 
+#"data/cost.txt" using 1:(1/($2)) title "Sleep" with lines lc rgb "#4287f5" lw 3 dt 2, \
+
 plot \
-  "data/cost.txt" using 1:(1/($2)) title "Sleep" with lines lc rgb "#4287f5" lw 3 dt 2, \
   "data/cost.txt" using 1:(1/($3)) title "Rest" with lines lc rgb "#fcbd35" lw 3 lt 2, \
   "data/cost.txt" using 1:(1/($4)) title "File hashing" with lines lc rgb "#c625cf" lw 3 lt 3, \
   "data/cost.txt" using 1:(1/($5)) title "Image class." with lines lc rgb "#00875c" lw 3 dt 3

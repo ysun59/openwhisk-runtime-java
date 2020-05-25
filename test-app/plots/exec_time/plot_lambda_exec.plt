@@ -9,7 +9,7 @@ set style line 80 lt rgb "#808080"
 
 # Line style for grid
 set style line 81 lt 0  # dashed
-set style line 81 lt rgb "#808080"  # grey
+set style line 81 lt rgb "#cccccc"  # grey
 # set missing "?"
 
 set grid back linestyle 81
@@ -26,9 +26,9 @@ set y2label "Cost ($)" font ",9" offset -3.
 set xlabel "CPU allocation" font ",9" #offset 2
 
 
-#unset key
+unset key
+#set key inside top left font ",9"
 #set key title "# direct links"
-set key inside top left font ",9"
 #set key at 1.8, 160
 #set key above font ",7" horizontal
 #set key spacing 1.25 samplen 0.5 height 0.7
@@ -54,6 +54,11 @@ set y2range[0:0.000002]
 #set xrange[1:2.1]
 #set xrange [:8]
 #set logscale y
+
+
+set label 1 "Execution time" at 1.15,35 font ",9"
+set label 2 "Cost" at 1.5,110 font ",9"
+
 plot \
   "./data_raw/lambda_data.txt" using (($1)):(($2)) title "Execution time" with lines dashtype "..._." lc rgb "red" lw 1.5 lt 1, \
   "./data_raw/lambda_data.txt" using (($1)):(($1)*($2)*(0.00000002083)) title "Cost" with lines dashtype '.____.' lc rgb "orange" lw 1.5 lt 2 axes x1y2
