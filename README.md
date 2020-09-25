@@ -17,6 +17,18 @@
 #
 -->
 
+# Photons
+
+## Setup
+
+To try Photons you need to have an installation of OpenWhisk and setup the Java runtime environment. To do so
+- checkout the ```devel``` branch of this repository and follow the instructions below on how to "Deploying the Java runtime image to OpenWhisk";
+- unlock concurrent requests for the Java runtime environment ```java8``` (see details in [OpenWhisk docs](https://github.com/apache/openwhisk/blob/master/docs/concurrency.md)).
+
+## Testing
+
+There are multiple tests in the directory ```test-app```. Tests include simple examples of functions which scripts to help registering the function and invoking it. Scripts might have paths to OpenWhisk installation that might need to be updated.
+
 # Apache OpenWhisk runtimes for java
 
 [![Build Status](https://travis-ci.org/apache/openwhisk-runtime-java.svg?branch=master)](https://travis-ci.org/apache/openwhisk-runtime-java)
