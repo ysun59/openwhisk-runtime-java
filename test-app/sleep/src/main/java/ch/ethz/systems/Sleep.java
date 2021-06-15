@@ -82,6 +82,10 @@ public class Sleep{
 
     }
 
+    public static JsonObject main(JsonObject args) {
+        return main(args, null, 0);
+    }
+
 }
 
 

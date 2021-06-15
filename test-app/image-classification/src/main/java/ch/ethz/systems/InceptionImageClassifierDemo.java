@@ -24,7 +24,9 @@ public class InceptionImageClassifierDemo {
         classifier = new InceptionImageClassifier();
         try {
             // cls.load_model(ResourceUtils.getInputStream("tf_models/tensorflow_inception_graph.pb"));
-            minioClient = new MinioClient("http://r630-01:9000", "keykey", "secretsecret");
+//          minioClient = new MinioClient("http://172.17.0.1:9000", "keykey", "secretsecret");
+            minioClient = new MinioClient("http://192.168.122.242:9000", "keykey", "secretsecret");
+//          minioClient = new MinioClient("http://r630-01:9000", "keykey", "secretsecret");
             InputStream is = minioClient.getObject("files", "tensorflow_inception_graph.pb");
             classifier.load_model(is);
             is = minioClient.getObject("files", "imagenet_comp_graph_label_strings.txt");

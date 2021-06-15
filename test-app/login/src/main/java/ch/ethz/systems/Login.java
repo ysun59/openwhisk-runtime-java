@@ -1,5 +1,4 @@
 package ch.ethz.systems;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import com.google.gson.JsonObject;
@@ -10,61 +9,47 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
-
-
+import java.io.StringWriter;
+import java.io.PrintWriter;
 public class Login {
-
-    private static final String db = "mongodb://r630-01:27017";
-
+    private static final String db = "mongodb://172.17.0.1";
     private static MongoClient createconn() {
         try {
-            return new MongoClient(new MongoClientURI(db));
+            return new MongoClient("172.17.0.1", 27017);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
     
-	private static MongoClient getConn(ConcurrentHashMap<String, Object> cglobals) {
-		MongoClient con = null;
-		String key = String.format("mongo-%d",Thread.currentThread().getId());
-    	if (!cglobals.containsKey(key)) {
-    		con = createconn();
-    		cglobals.put(key, con);
-    	} else {
-    		con = (MongoClient) cglobals.get(key);
-    	}
-    	return con;
-	}
-	
-	public static boolean login(ConcurrentHashMap<String, Object> globals, String username, String password) {
-		MongoClient mc = getConn(globals);
-		DB database = mc.getDB("mydatabase");
-		DBCollection collection = database.getCollection("customers");
-		DBObject query = new BasicDBObject("username", username);
-		DBCursor cursor = collection.find(query);
-		return ((String)cursor.one().get("password")).equals(password);
-	}
-    
-    public static JsonObject main(JsonObject args, Map<String, Object> globals, int id) {
-    	ConcurrentHashMap<String, Object> cglobals = (ConcurrentHashMap<String, Object>) globals;
-    	JsonObject response = new JsonObject();
-        long time = System.currentTimeMillis();
-
-        if (login(cglobals, args.getAsJsonPrimitive("username").getAsString(), args.getAsJsonPrimitive("password").getAsString())) {
-        	response.addProperty("succeeded", "true");
-        } else {
-        	response.addProperty("succeeded", "false");
+        public static boolean login(String username, String password) {
+                MongoClient mc = createconn();
+                DB database = mc.getDB("mydatabase");
+                DBCollection collection = database.getCollection("customers");
+                DBObject query = new BasicDBObject("username", username);
+                DBCursor cursor = collection.find(query);
+                DBObject found = cursor.one();
+                System.out.println("test");
+		if (found == null) {
+                  return false;
+                }
+                return ((String)cursor.one().get("password")).equals(password);
         }
-            	
-    	response.addProperty("time", System.currentTimeMillis() - time);
-    	return response;
+    
+    public static JsonObject main(JsonObject args) {
+        JsonObject response = new JsonObject();
+        long time = System.currentTimeMillis();
+        if (login(args.getAsJsonPrimitive("username").getAsString(), args.getAsJsonPrimitive("password").getAsString())) {
+                response.addProperty("succeeded", "true");
+        } else {
+                response.addProperty("succeeded", "false");
+       }
+                
+        response.addProperty("time", System.currentTimeMillis() - time);
+        return response;
     }
     
     public static void main(String[] args) throws Exception {
-    	ConcurrentHashMap<String, Object> cglobals = new ConcurrentHashMap<String, Object>();
-    	System.out.println(login(cglobals, "username1", "password1"));
-    	System.out.println(login(cglobals, "username1", "password2"));
+        System.out.println(login("username1", "password1"));
+        System.out.println(login("username1", "password2"));
     }
 }
-
-

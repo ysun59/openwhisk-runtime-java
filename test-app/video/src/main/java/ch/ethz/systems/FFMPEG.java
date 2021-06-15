@@ -67,7 +67,9 @@ public class FFMPEG {
 	public static void init_classifier() {
 		try {
 			// cls.load_model(ResourceUtils.getInputStream("tf_models/tensorflow_inception_graph.pb"));
-			minioClient = new MinioClient("http://r630-01:9000", "keykey", "secretsecret");
+                        minioClient = new MinioClient("http://192.168.122.242:9000", "keykey", "secretsecret");
+//			minioClient = new MinioClient("http://172.17.0.1:9000", "keykey", "secretsecret");
+//			minioClient = new MinioClient("http://r630-01:9000", "keykey", "secretsecret");
 			InputStream is = minioClient.getObject("files", "ffmpeg");
 			copyInputStreamToFile(is, new File("ffmpeg"));
 			Process process = Runtime.getRuntime().exec("chmod +x ./ffmpeg");
