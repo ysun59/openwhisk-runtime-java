@@ -2,7 +2,8 @@
 
 import pymongo
 
-myclient = pymongo.MongoClient("mongodb://r630-01:27017/")
+myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
+#myclient = pymongo.MongoClient("mongodb://r630-01:27017/")
 
 mydb = myclient["mydatabase"]
 mycol = mydb["customers"]
