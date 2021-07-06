@@ -23,7 +23,8 @@ def execute(command):
 ip_address = '172.17.0.1:3233'
 #ip_address = '10.1.212.71'
 #ip_address = '129.132.102.71'
-url='https://%s/api/v1/namespaces/_/actions/%s?blocking=true&result=true'
+url='http://%s/api/v1/namespaces/_/actions/%s?blocking=true&result=true'
+#url='https://%s/api/v1/namespaces/_/actions/%s?blocking=true&result=true'
 headers = {
     "Authorization": "Basic MjNiYzQ2YjEtNzFmNi00ZWQ1LThjNTQtODE2YWE0ZjhjNTAyOjEyM3pPM3haQ0xyTU42djJCS0sxZFhZRnBYbFBrY2NPRnFtMTJDZEFzTWdSVTRWck5aOWx5R1ZDR3VNREdJd1A=",
     "Content-Type": "application/json",
@@ -31,14 +32,15 @@ headers = {
 }
 
 parser = ArgumentParser()
-parser.add_argument("-nt", "--number_of_threads",     type=int, default=15,  help="The number of threads")
+parser.add_argument("-nt", "--number_of_threads",     type=int, default=5,  help="The number of threads")
 #parser.add_argument("-nt", "--number_of_threads",     type=int, default=15,  help="The number of threads")
-parser.add_argument("-ne", "--number_of_experiments", type=int, default=10, help="Total number of requests to server")
+parser.add_argument("-ne", "--number_of_experiments", type=int, default=1, help="Total number of requests to server")
 #parser.add_argument("-ne", "--number_of_experiments", type=int, default=100, help="Total number of requests to server")
 parser.add_argument("-wl", "--workload", type=str, default='Sleep', help="Workload name")
 parser.add_argument("-wl2", "--workload2", type=str, default='Sleep2', help="Workload2 name")
-parser.add_argument("-c", "--concurrency", type=int, default=1, help="The number of threads")
-parser.add_argument("-f", "--frequency", type=int, default=10, help="Frequency of shifting workloads")
+parser.add_argument("-c", "--concurrency", type=int, default=4, help="The number of threads")
+#parser.add_argument("-c", "--concurrency", type=int, default=1, help="The number of threads")
+parser.add_argument("-f", "--frequency", type=int, default=12, help="Frequency of shifting workloads")
 parser.add_argument("-m", "--memory", type=int, default=256, help="Memory")
 args = parser.parse_args()
 
@@ -52,17 +54,17 @@ def deploy_functions():
     dc = deploy_command%(ip_address, args.workload, str(args.concurrency))
     print(dc)
 #   dc = 'wsk --apihost http://172.17.0.1:3233 action update -i Sleep ./target/sleep.jar --main ch.ethz.systems.Sleep --docker ysun59/java8action -c 1'
-    print(dc)
+#   print(dc)
 #   dc = deploy_command%(ip_address, args.workload, str(args.concurrency), str(memory))
     execute(dc)
 
-    """
     #deploy constant workload
     #dc = deploy_command%(ip_address, args.workload2, '1')
-    dc = deploy_command%(args.workload2)
+    dc = deploy_command%(ip_address, args.workload2, str(args.concurrency))
 #   dc = deploy_command%(ip_address, args.workload2, str(args.concurrency), str(args.memory))
+    print(dc)
     execute(dc)
-    """
+
 
 def main():
     deploy_functions()
@@ -78,23 +80,28 @@ def main():
 
         start = time.time()
 
-#        workload = ''
-#        alterante_frequency = args.frequency
-#        if (start%alterante_frequency) < (alterante_frequency/2):
-#            workload = args.workload
-#        else:
-#            workload = args.workload2
+        workload = ''
+        alterante_frequency = args.frequency
+        print(start%alterante_frequency)
+        print(alterante_frequency/2)
+        if (start%alterante_frequency) < (alterante_frequency/2):
+            workload = args.workload
+        else:
+            workload = args.workload2
 
-        workload = 'Sleep'
-        payload = { 'time' : 1000 }
+#       workload = 'Sleep'
         request_url = url%(ip_address, workload)
-        request_url = 'http://172.17.0.1:3233/api/v1/namespaces/_/actions/Sleep?blocking=true&result=true'
+        print(request_url)
+#       request_url = 'http://172.17.0.1:3233/api/v1/namespaces/_/actions/Sleep?blocking=true&result=true'
+#       print(request_url)
 
         r = requests.post(request_url, data=json.dumps(payload), headers=headers, verify=False)
+        print(r.json())
         end = time.time()
         et = round((end-start)*1000,3)
         print(f"{payload} -> {r.text} -> {et}ms")
 
+        print('slow_start\":\"0')
         isSlowStart = 0 if 'slow_start\":\"0' in r.text else 1
         # isSlowStart = 0 if 'slow_start\":\"0' in r.text else 2
         # if isSlowStart != 0:
