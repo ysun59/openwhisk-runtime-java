@@ -9,5 +9,6 @@
 
 # wsk --apihost https://129.132.102.71 --auth 23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP action create -i FileHashing filehashing.jar --main FileHashing --docker rfbpb/java8action -c 1
 
+#wsk action update -i TF ./target/image-classifier.jar --memory 800 --main ch.ethz.systems.InceptionImageClassifierDemo --docker openwhisk/java8action -c 1 -t 300000
 wsk action update -i TF ./target/image-classifier.jar --memory 800 --main ch.ethz.systems.InceptionImageClassifierDemo --docker ysun59/java8action -c 1 -t 300000
 #wsk --apihost https://129.132.102.71 --auth 23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP action create -i TF tf/target/image-classifier.jar --main com.github.chen0040.tensorflow.classifiers.images.InceptionImageClassifierDemo --docker rfbpb/java8action -c 1

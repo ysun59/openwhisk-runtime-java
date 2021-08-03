@@ -8,5 +8,5 @@
 
 #wsk=$docker_compose/openwhisk-src/bin/wsk
 
-wsk action --result  -i invoke FileHashing  --param seed 12
+wsk action --result  -i invoke FileHashing  --param seed 15
 #$wsk action --result  -i invoke FileHashing  --param seed 1234

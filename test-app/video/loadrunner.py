@@ -32,7 +32,7 @@ headers = {
 
 parser = ArgumentParser()
 parser.add_argument("-nt", "--number_of_threads",     type=int, default=8,  help="The number of threads")
-parser.add_argument("-ne", "--number_of_experiments", type=int, default=100, help="Total number of requests to server")
+parser.add_argument("-ne", "--number_of_experiments", type=int, default=2, help="Total number of requests to server")
 parser.add_argument("-wl", "--workload", type=str, default='video', help="Workload name")
 parser.add_argument("-wl2", "--workload2", type=str, default='video2', help="Workload2 name")
 parser.add_argument("-c", "--concurrency", type=int, default=1, help="The number of threads")

@@ -15,6 +15,8 @@ import ch.ethz.systems.images.models.inception.InceptionImageClassifier;
 import ch.ethz.systems.images.utils.ResourceUtils;
 import io.minio.MinioClient;
 
+import java.util.HashMap;
+
 public class InceptionImageClassifierDemo {
 
     public static InceptionImageClassifier classifier = null;
@@ -24,8 +26,8 @@ public class InceptionImageClassifierDemo {
         classifier = new InceptionImageClassifier();
         try {
             // cls.load_model(ResourceUtils.getInputStream("tf_models/tensorflow_inception_graph.pb"));
-//          minioClient = new MinioClient("http://172.17.0.1:9000", "keykey", "secretsecret");
-            minioClient = new MinioClient("http://192.168.122.242:9000", "keykey", "secretsecret");
+            minioClient = new MinioClient("http://172.17.0.1:9000", "keykey", "secretsecret");
+//          minioClient = new MinioClient("http://192.168.122.242:9000", "keykey", "secretsecret");
 //          minioClient = new MinioClient("http://r630-01:9000", "keykey", "secretsecret");
             InputStream is = minioClient.getObject("files", "tensorflow_inception_graph.pb");
             classifier.load_model(is);
@@ -117,4 +119,10 @@ public class InceptionImageClassifierDemo {
         response.addProperty("slow_start", slow_start);
         return response;
     }
+
+    public static JsonObject main(JsonObject args) {
+        Map<String, Object> m = new HashMap<String, Object>();
+        return main(args, m, 0);
+    }
+
 }

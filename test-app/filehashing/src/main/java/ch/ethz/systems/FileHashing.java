@@ -8,6 +8,8 @@ import javax.xml.bind.DatatypeConverter;
 import com.google.gson.JsonObject;
 import io.minio.MinioClient;
 
+import java.util.HashMap;
+
 public class FileHashing {
 
 	private static final int size = 2*1024*1024;
@@ -77,6 +79,12 @@ public class FileHashing {
     	response.addProperty("time", System.currentTimeMillis() - time);
     	return response;
     }
+
+    public static JsonObject main(JsonObject args) {
+        Map<String, Object> m = new ConcurrentHashMap<String, Object>();
+        return main(args, m, 0);
+    }
+
 }
 
 

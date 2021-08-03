@@ -122,13 +122,21 @@ public class FFMPEG {
 		}
 
 	}
-
+/**
 	public static void main(String[] args) throws IOException {
+		System.out.println("enter myself main");
 		HashMap<String, Object> m = new HashMap<String, Object>();
 		main(null, m, 0);
 	}
+*/
+	public static JsonObject main(JsonObject args) {
+		System.out.println("enter main sy");
+		HashMap<String, Object> m = new HashMap<String, Object>();
+        	return main(args, m, 0);
+	}
 
 	public static JsonObject main(JsonObject args, Map<String, Object> globals, int id) {
+		System.out.println("enter main");
 		boolean slow_start = true;
 		double m0 = current_utilization_runtime();
 		synchronized (globals) {
