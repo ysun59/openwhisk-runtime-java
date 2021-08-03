@@ -12,6 +12,7 @@ bash
 `nvm install 12`
 
 `nvm use 12`
+
 `sudo touch /tmp/myrunc/log.txt`
 
 `sudo chmod 777 /tmp/myrunc/log.txt`
