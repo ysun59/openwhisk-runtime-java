@@ -1,6 +1,6 @@
 # Preqeuists
 ## Install docker, java
-```bash
+```java
 sudo apt  install -y docker.io
 ```
 
@@ -8,19 +8,16 @@ sudo apt  install -y docker.io
 sudo apt-get install -y openjdk-8-jdk
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.36.0/install.sh | bash
 bash
+nvm install 12
+nvm use 12
 ```
-`nvm install 12`
-
-`nvm use 12`
-
-`sudo touch /tmp/myrunc/log.txt`
-
-`sudo chmod 777 /tmp/myrunc/log.txt`
 
 ## Install openwhisk
-`git clone https://github.com/ysun59/openwhisk.git`
-`cd openwhisk`
-`git checkout master6.3.sy`
+```shell
+git clone https://github.com/ysun59/openwhisk.git
+cd openwhisk
+git checkout master6.3.sy
+```
 `./gradlew core:standalone:bootRun`
 ## Install wsk
 `mkdir wsk-cli`
