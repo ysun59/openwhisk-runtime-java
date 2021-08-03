@@ -1,10 +1,10 @@
 # Preqeuists
 ## Install docker, java
-```java
+```
 sudo apt  install -y docker.io
 ```
 
-```bash
+```shell
 sudo apt-get install -y openjdk-8-jdk
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.36.0/install.sh | bash
 bash
@@ -13,7 +13,7 @@ nvm use 12
 ```
 
 ## Install openwhisk
-```shell
+```bash
 git clone https://github.com/ysun59/openwhisk.git
 cd openwhisk
 git checkout master6.3.sy
