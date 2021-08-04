@@ -126,7 +126,6 @@ Set the ip to "http://172.17.0.1:9000” or the ip of command "ifconfig"
 
 ### Run 'login'
 #### Install MongoDB
-[https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu-tarball](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu-tarball）
 [mongodb install link](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu-tarball/)
 #### start MongoDB
 ```bash
