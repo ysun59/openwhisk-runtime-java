@@ -1,8 +1,8 @@
 
 * [Prerequists](#Prerequists) (Install docker, java, nodejs, requests, matplotlib)
 * Run openwhisk-runtime-java:
-  * [Run individual functions](#Run-individual-functions)
-  * [Run loadrunner-canrun.py](#Run-loadrunner-canrun-py) 
+  * [Run individual functions](#Run-individual-functions) (run five individual functions: sleep, filehashing, video, image-classification, login)
+  * [Run loadrunner-canrun.py](#Run-loadrunner-canrun-py) (run 100 experiments synchronously)
 
 
 # Prerequists
@@ -151,7 +151,7 @@ cd test-app/login/
 
 
 ## Run loadrunner canrun py
-run 100 experiments synchromously
+run 100 experiments synchronously
 ```bash
 cd openwhisk-runtime-java/test-app/sleep
 ./run-test2.sh
