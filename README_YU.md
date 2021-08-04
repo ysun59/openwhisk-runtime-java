@@ -1,8 +1,15 @@
-# Preqeuists
-## Install docker, java, nodejs, requests
+
+* [Prerequists](#Prerequists) (Install docker, java, nodejs, requests, matplotlib)
+* Run openwhisk-runtime-java:
+  * [Run individual functions](#1.-Run-individual-functions)
+  * [Run loadrunner-canrun.py](#2.-Run-loadrunner-canrun.py)
+
+
+# Prerequists
+## Install docker, java, nodejs, requests, matplotlib
 ```bash
 sudo apt-get update
-sudo apt  install -y docker.io
+sudo apt install -y docker.io
 sudo usermod -aG docker ${USER}
 sudo reboot
 ```
@@ -26,6 +33,7 @@ pip3 install matplotlib
 ```
 
 ## Install openwhisk
+[ysun59/openwhisk](https://github.com/ysun59/openwhisk)
 ```bash
 git clone https://github.com/ysun59/openwhisk.git
 cd openwhisk
@@ -56,8 +64,10 @@ cd openwhisk-runtime-java
 git checkout develsy
 ```
 
+
+
 # Run
-## Run individual functions
+## 1. Run individual functions
 Run five functions in openwhisk-runtime-java/test-app folder
 sleep, filehashing, video, image-classification, login
 ### Run 'Sleep'
@@ -72,7 +82,7 @@ cd openwhisk-runtime-java/test-app/sleep
 cd openwhisk-runtime-java/
 ./minio-populate.sh
 ```
-### Run filehashing
+### Run 'filehashing'
 ```bash
 cd openwhisk-runtime-java
 ./minio.sh
@@ -86,7 +96,7 @@ Set the ip to "http://172.17.0.1:9000” or the ip of command "ifconfig"
 ./run-openwhisk.sh
 ```
 
-### Run video
+### Run 'video'
 ```bash
 cd openwhisk-runtime-java
 ./minio.sh
@@ -100,7 +110,7 @@ Set the ip to "http://172.17.0.1:9000” or the ip of command "ifconfig"
 ./run-openwhisk.sh
 ```
 
-### Run image-classification
+### Run 'image-classification'
 ```bash
 cd openwhisk-runtime-java
 ./minio.sh
@@ -114,16 +124,16 @@ Set the ip to "http://172.17.0.1:9000” or the ip of command "ifconfig"
 ./run-openwhisk.sh
 ```
 
-### Run login
-#### Install mongoDB
-（https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu-tarball/）
-#### start mongoDB
+### Run 'login'
+#### Install MongoDB
+[https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu-tarball/](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu-tarball/）
+#### start MongoDB
 ```bash
 mongod  --dbpath /var/lib/mongo --logpath /var/log/mongodb/mongod.log --fork --bind_ip 0.0.0.0 
 ```
-**Note** --bind_ip 0.0.0.0 so 
+**Note** need `--bind_ip 0.0.0.0` when start the MongoDB so that containers can query the data in local MongoDB
 **modify nano src/main/java/ch/ethz/systems/InceptionImageClassifierDemo.java**
-Set the ip to "http://172.17.0.1:9000” or the ip of command "ifconfig"
+Set the ip to `http://172.17.0.1:9000` or the ip of command `ifconfig`
 
 #### generate data needed for login function
 ```bash
@@ -138,7 +148,7 @@ cd test-app/login/
 ./run-openwhisk.sh
 ```
 
-## Run loadrunner.py
+## 2. Run loadrunner-canrun.py
 run 100 experiments synchromously
 ```bash
 cd openwhisk-runtime-java/test-app/sleep
@@ -153,4 +163,4 @@ Can open "loadrunner-canrun.py", modify the line "deploy_command = 'wsk .....--d
 cd openwhisk-runtime-java/test-app/sleep
 python3 plot.py
 ```
-same as filehashing, video, image-classification, login
+same as 'filehashing', 'video', 'image-classification', 'login' functions
