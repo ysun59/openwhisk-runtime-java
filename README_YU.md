@@ -33,13 +33,13 @@ pip3 install matplotlib
 ```
 
 ## Install openwhisk
-   ### [ysun59/openwhisk](https://github.com/ysun59/openwhisk)
-   ```bash
+### [ysun59/openwhisk](https://github.com/ysun59/openwhisk)
+```bash
 git clone https://github.com/ysun59/openwhisk.git
-   cd openwhisk
+cd openwhisk
 git checkout master6.3.sy
 ```
-   ### Statrt openwhisk
+### Statrt openwhisk
 ```bash
 cd openwhisk
 ./gradlew core:standalone:bootRun 
@@ -55,7 +55,6 @@ sudo cp wsk-cli/wsk /usr/local/bin/
 wsk property set --apihost 'http://172.17.0.1:3233'
 wsk property set --auth 23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP
 ```
-
 
 ## Install openwhisk-runtime-java
 ```bash
@@ -82,6 +81,7 @@ cd openwhisk-runtime-java/test-app/sleep
 cd openwhisk-runtime-java/
 ./minio-populate.sh
 ```
+
 ### Run 'filehashing'
 ```bash
 cd openwhisk-runtime-java
