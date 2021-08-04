@@ -1,11 +1,11 @@
 
-* [Prerequists](#Prerequists) (Install docker, java, nodejs, requests, matplotlib)
+* [Prerequisite](#Prerequisite) (Install docker, java, nodejs, requests, matplotlib)
 * Run openwhisk-runtime-java:
   * [Run individual functions](#Run-individual-functions) (run five individual functions: sleep, filehashing, video, image-classification, login)
   * [Run loadrunner-canrun.py](#Run-loadrunner-canrun-py) (run 100 experiments synchronously)
 
 
-# Prerequists
+# Prerequisite
 ## Install docker, java, nodejs, requests, matplotlib
 ```bash
 sudo apt-get update
@@ -151,18 +151,20 @@ cd test-app/login/
 
 
 ## Run loadrunner canrun py
-run 100 experiments synchronously
+Run 100 experiments synchronously. `run-test2.sh` will call the `test2.sh`, and it will call the function `loadrunner-canrun.py`. You can modify the parameters in `test2.sh` in the line `python3 loadrunner-canrun.py -c $1 -nt $2 -ne 100 -m 4000`
 ```bash
 cd openwhisk-runtime-java/test-app/sleep
 ./run-test2.sh
 ```
 It will generate the data to the data folder
-Can open "loadrunner-canrun.py", modify the line "deploy_command = 'wsk .....--docker openwhisk/java8action', to generate the data with default openwhisk/java8action or photon papters solution: --docker ysun59/java8action 
-`cp -r data data-openwhisk` or `cp -r data data-pho`
+Can open "loadrunner-canrun.py", modify the line `deploy_command = wsk .....--docker openwhisk/java8action`, to generate the data with default openwhisk/java8action or photon papters solution: `--docker ysun59/java8action`
+`cp -r data data-openwhisk` when use `--docker openwhisk/java8action` in "loadrunner-canrun.py" or 
+`cp -r data data-pho` when use `--docker ysun59/java8action` in "loadrunner-canrun.py".
 
 ### evaluation and plot
+Need to have "data", "data-openwhisk" and "data-pho" folder, it will report the avg execution time in each situation, and generate the graph in "plots/compare" folder.
 ```bash
 cd openwhisk-runtime-java/test-app/sleep
 python3 plot.py
 ```
-same as 'filehashing', 'video', 'image-classification', 'login' functions
+Same as 'filehashing', 'video', 'image-classification', 'login' functions
