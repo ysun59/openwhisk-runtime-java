@@ -3,10 +3,8 @@
 * Run openwhisk-runtime-java:
   * [Run individual functions](#Run-individual-functions)
   * [Run loadrunner-canrun.py](#Run-loadrunner-canrun-py) 
-  * [Run loadrunner-canrun.py](#Run-loadrunner/-canrun-py)
 
-# Run-loadrunner-canrun.py
-# Run loadrunner canrun py
+
 # Prerequists.py
 ## Install docker, java, nodejs, requests, matplotlib
 ```bash
@@ -129,6 +127,7 @@ Set the ip to "http://172.17.0.1:9000” or the ip of command "ifconfig"
 ### Run 'login'
 #### Install MongoDB
 [https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu-tarball](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu-tarball）
+[mongodb install link](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu-tarball/)
 #### start MongoDB
 ```bash
 mongod  --dbpath /var/lib/mongo --logpath /var/log/mongodb/mongod.log --fork --bind_ip 0.0.0.0 
@@ -150,7 +149,7 @@ cd test-app/login/
 ./run-openwhisk.sh
 ```
 
-## Run loadrunner-canrun.py
+## Run loadrunner canrun py
 run 100 experiments synchromously
 ```bash
 cd openwhisk-runtime-java/test-app/sleep
