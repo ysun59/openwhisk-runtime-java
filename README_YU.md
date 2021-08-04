@@ -2,9 +2,11 @@
 * [Prerequists](#Prerequists) (Install docker, java, nodejs, requests, matplotlib)
 * Run openwhisk-runtime-java:
   * [Run individual functions](#Run-individual-functions)
-  * [Run loadrunner-canrun.py](#Run-loadrunner-canrun.py)
+  * [Run loadrunner-canrun.py](#Run-loadrunner-canrun.py) 
+  * [Run loadrunner-canrun.py](#Run-loadrunner/-canrun.py)
 
-
+#Run-loadrunner-canrun.py
+#Run loadrunner canrun.py
 # Prerequists
 ## Install docker, java, nodejs, requests, matplotlib
 ```bash
@@ -126,7 +128,7 @@ Set the ip to "http://172.17.0.1:9000” or the ip of command "ifconfig"
 
 ### Run 'login'
 #### Install MongoDB
-[https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu-tarball/](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu-tarball/）
+[https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu-tarball](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu-tarball）
 #### start MongoDB
 ```bash
 mongod  --dbpath /var/lib/mongo --logpath /var/log/mongodb/mongod.log --fork --bind_ip 0.0.0.0 
