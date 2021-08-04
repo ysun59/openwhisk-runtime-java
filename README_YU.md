@@ -158,7 +158,9 @@ cd openwhisk-runtime-java/test-app/sleep
 ```
 It will generate the data to the data folder
 Can open "loadrunner-canrun.py", modify the line `deploy_command = wsk .....--docker openwhisk/java8action`, to generate the data with default openwhisk/java8action or photon papters solution: `--docker ysun59/java8action`
+
 `cp -r data data-openwhisk` when use `--docker openwhisk/java8action` in "loadrunner-canrun.py" or 
+
 `cp -r data data-pho` when use `--docker ysun59/java8action` in "loadrunner-canrun.py".
 
 ### evaluation and plot
