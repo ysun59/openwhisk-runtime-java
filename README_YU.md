@@ -89,7 +89,7 @@ cd openwhisk-runtime-java
 cd openwhisk-runtime-java/test-app/filehashing
 ```
 **modify nano src/main/java/ch/ethz/systems/FileHashing.java**
-Set the ip to "http://172.17.0.1:9000” or the ip of command "ifconfig"
+Set the ip to `"http://172.17.0.1:9000"`or the ip of command `ifconfig`
 ```bash
 ./build.sh
 ./init-openwhisk.sh
