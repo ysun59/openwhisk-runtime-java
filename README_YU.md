@@ -164,7 +164,7 @@ Can open "loadrunner-canrun.py", modify the line `deploy_command = wsk .....--do
 `cp -r data data-pho` when use `--docker ysun59/java8action` in "loadrunner-canrun.py".
 
 ### evaluation and plot
-Need to have "data", "data-openwhisk" and "data-pho" folder, it will report the avg execution time in each situation, and generate the graph in "plots/compare" folder.
+Need to have "data", "data-openwhisk" and "data-pho" folder(can be empty). plot.py will report the avg execution time in data folder, and generate the comparison graph in "plots/compare" folder based on the data in "data-openwhisk" and "data-pho".
 ```bash
 cd openwhisk-runtime-java/test-app/sleep
 python3 plot.py
