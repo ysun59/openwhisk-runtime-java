@@ -2,7 +2,7 @@
 * [Prerequists](#Prerequists.py) (Install docker, java, nodejs, requests, matplotlib)
 * Run openwhisk-runtime-java:
   * [Run individual functions](#Run-individual-functions)
-  * [Run loadrunner-canrun.py](#Run-loadrunner-canrun py) 
+  * [Run loadrunner-canrun.py](#Run-loadrunner-canrun-py) 
   * [Run loadrunner-canrun.py](#Run-loadrunner/-canrun-py)
 
 # Run-loadrunner-canrun.py
